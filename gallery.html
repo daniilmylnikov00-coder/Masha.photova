@@ -48,21 +48,20 @@
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-        // Используйте те же ключи, что и в admin.html
-        const SUPABASE_URL = 'ВАШ_PROJECT_URL';
-        const SUPABASE_ANON_KEY = 'ВАШ_ANON_KEY';
+        // ВСТАВЬТЕ СЮДА ВАШИ ДАННЫЕ (БЕЗ SERVICE_ROLE_KEY!)
+        const SUPABASE_URL = 'ВАШ_PROJECT_URL_ЗДЕСЬ'; 
+        const SUPABASE_ANON_KEY = 'sb_publishable_5yXVeHuf370Cq4cnlyhTgQ_W6tknQzh'; // Ваш публичный ключ
         
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         async function loadPhotos() {
             const grid = document.getElementById('photo-grid');
             
-            // Получаем список всех файлов из бакета 'photos'
             const { data: files, error } = await supabase.storage
                 .from('photos')
                 .list('', {
                     limit: 100,
-                    sortBy: { column: 'created_at', order: 'desc' } // Сначала новые
+                    sortBy: { column: 'created_at', order: 'desc' }
                 });
 
             if (error) {
@@ -76,10 +75,9 @@
                 return;
             }
 
-            grid.innerHTML = ''; // Очищаем
+            grid.innerHTML = '';
 
             files.forEach(file => {
-                // Получаем публичную ссылку на каждое фото
                 const { data } = supabase.storage
                     .from('photos')
                     .getPublicUrl(file.name);
