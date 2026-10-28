@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin | Upload Photos</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 500px; margin: 0 auto; background: #f9f8f6; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; background: #1a1a1a; color: white; border: none; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        button:disabled { background: #888; }
+        #status { margin-top: 20px; text-align: center; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2>Upload New Photo</h2>
+    <p>Select an image from your device. It will be saved in the cloud and appear on the website.</p>
+    
+    <input type="file" id="fileInput" accept="image/*">
+    <input type="text" id="category" placeholder="Category (e.g. portraits, couples, brand)">
+    <button onclick="uploadPhoto()" id="uploadBtn">Upload Photo</button>
+    
+    <div id="status"></div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+        // Вставьте сюда ваши данные из Supabase
+        const SUPABASE_URL = 'ВАШ_PROJECT_URL';
+        const SUPABASE_ANON_KEY = 'ВАШ_ANON_KEY';
+        
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        window.uploadPhoto = async function() {
+            const fileInput = document.getElementById('fileInput');
+            const category = document.getElementById('category').value || 'portraits';
+            const statusDiv = document.getElementById('status');
+            const uploadBtn = document.getElementById('uploadBtn');
+
+            if (fileInput.files.length === 0) {
+                statusDiv.textContent = 'Please select a file first.';
+                return;
+            }
+
+            const file = fileInput.files[0];
+            // Создаем уникальное имя файла (время + оригинальное имя)
+            const fileName = `${Date.now()}_${file.name}`;
+            
+            uploadBtn.disabled = true;
+            statusDiv.textContent = 'Uploading...';
+
+            try {
+                // Загружаем файл в бакет 'photos'
+                const { data, error } = await supabase.storage
+                    .from('photos')
+                    .upload(fileName, file);
+
+                if (error) throw error;
+
+                statusDiv.textContent = 'Upload successful!';
+                fileInput.value = ''; // Очищаем поле
+                
+            } catch (error) {
+                console.error(error);
+                statusDiv.textContent = 'Error: ' + error.message;
+            } finally {
+                uploadBtn.disabled = false;
+            }
+        };
+    </script>
+</body>
+</html>
