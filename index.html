@@ -24,7 +24,8 @@
             <h2>Moments worth keeping.</h2>
             <p>Real moments. Warm light. Images you'll keep forever.</p>
             <div class="hero-buttons">
-                <button class="btn-primary open-modal">Check Availability</button>
+                <!-- Кнопка теперь ведет в Instagram Direct -->
+                <a href="https://ig.me/m/masha.photova" target="_blank" class="btn-primary" style="text-decoration: none;">Check Availability</a>
                 <a href="#portfolio" class="btn-secondary">View Portfolio</a>
             </div>
         </div>
@@ -58,7 +59,7 @@
     <section id="about" class="section fade-in">
         <div class="container about-container">
             <div class="about-image">
-                <!-- Ваше фото с камерой (убедитесь, что файл есть в папке Image) -->
+                <!-- Ваше фото с камерой -->
                 <img src="Image/IMG_1490.jpeg" alt="Mariia Smirnova">
             </div>
             <div class="about-text">
@@ -87,7 +88,8 @@
                         <li>Private online gallery</li>
                         <li>High-resolution files</li>
                     </ul>
-                    <button class="btn-primary open-modal" style="width:100%">Book Essential</button>
+                    <!-- Кнопка теперь ведет в Instagram Direct -->
+                    <a href="https://ig.me/m/masha.photova" target="_blank" class="btn-primary" style="width:100%; display:block; text-align:center; box-sizing:border-box; text-decoration: none;">Book Essential</a>
                 </div>
                 
                 <!-- Пакет 2 -->
@@ -102,7 +104,8 @@
                         <li>70 professionally edited images</li>
                         <li>Private online gallery</li>
                     </ul>
-                    <button class="btn-primary open-modal" style="width:100%">Book All-Inclusive</button>
+                    <!-- Кнопка теперь ведет в Instagram Direct -->
+                    <a href="https://ig.me/m/masha.photova" target="_blank" class="btn-primary" style="width:100%; display:block; text-align:center; box-sizing:border-box; text-decoration: none;">Book All-Inclusive</a>
                 </div>
             </div>
         </div>
@@ -130,44 +133,6 @@
             </div>
         </div>
     </section>
-
-    <!-- Модальное окно (Форма записи) -->
-    <div id="bookingModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h3>Let’s plan your shoot.</h3>
-            <p>Fill out the details below, and I’ll get back to you within 24 hours.</p>
-            
-            <!-- Форма отправляется через Formspree -->
-            <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST" id="bookingForm">
-                <div class="form-group">
-                    <label for="name">Your Name</label>
-                    <input type="text" id="name" name="name" required placeholder="Jane Doe">
-                </div>
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" name="email" required placeholder="jane@example.com">
-                </div>
-                <div class="form-group">
-                    <label for="event">Event / Session Type</label>
-                    <!-- Сюда мы вписали ваши даты и пакеты -->
-                    <select id="event" name="event" required>
-                        <option value="" disabled selected>Select a session...</option>
-                        <option value="Essential Package ($350)">Essential Package ($350)</option>
-                        <option value="All-Inclusive Package ($550)">All-Inclusive Package ($550)</option>
-                        <option value="Georgetown Waterfront - Nov 15">Georgetown Waterfront - Nov 15</option>
-                        <option value="Old Town Alexandria - Nov 23">Old Town Alexandria - Nov 23</option>
-                        <option value="Custom Date / Other">Custom Date / Other</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="message">Tell me about your vision</label>
-                    <textarea id="message" name="message" rows="3" placeholder="Any specific ideas, location preferences, or vibe?"></textarea>
-                </div>
-                <button type="submit" class="btn-primary submit-btn">Send Inquiry</button>
-            </form>
-        </div>
-    </div>
 
     <!-- Подвал -->
     <footer>
