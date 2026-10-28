@@ -25,9 +25,9 @@
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-        // Вставьте сюда ваши данные из Supabase
-        const SUPABASE_URL = 'ВАШ_PROJECT_URL';
-        const SUPABASE_ANON_KEY = 'ВАШ_ANON_KEY';
+        // ВСТАВЬТЕ СЮДА ВАШИ ДАННЫЕ (БЕЗ SERVICE_ROLE_KEY!)
+        const SUPABASE_URL = 'ВАШ_PROJECT_URL_ЗДЕСЬ'; 
+        const SUPABASE_ANON_KEY = 'sb_publishable_5yXVeHuf370Cq4cnlyhTgQ_W6tknQzh'; // Ваш публичный ключ
         
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -43,14 +43,12 @@
             }
 
             const file = fileInput.files[0];
-            // Создаем уникальное имя файла (время + оригинальное имя)
             const fileName = `${Date.now()}_${file.name}`;
             
             uploadBtn.disabled = true;
             statusDiv.textContent = 'Uploading...';
 
             try {
-                // Загружаем файл в бакет 'photos'
                 const { data, error } = await supabase.storage
                     .from('photos')
                     .upload(fileName, file);
@@ -58,7 +56,7 @@
                 if (error) throw error;
 
                 statusDiv.textContent = 'Upload successful!';
-                fileInput.value = ''; // Очищаем поле
+                fileInput.value = ''; 
                 
             } catch (error) {
                 console.error(error);
