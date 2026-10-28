@@ -226,3 +226,92 @@ footer { text-align: center; padding: 40px; background-color: #1a1a1a; color: #f
     .section-title { font-size: 2.5rem; }
     .footer-content { flex-direction: column; gap: 15px; }
 }
+
+/* =========================================
+   АНИМАЦИИ И ПРОСМОТР ФОТО (LIGHTBOX)
+   ========================================= */
+
+/* Делаем скролл плавным и с прилипанием */
+.work-gallery {
+    scroll-behavior: smooth;
+    padding-bottom: 40px; /* Отступ, чтобы было удобно скроллить */
+}
+
+.work-gallery img {
+    cursor: zoom-in; /* Курсор в виде лупы */
+    transition: transform 0.4s ease, filter 0.4s ease;
+}
+
+.work-gallery img:hover {
+    filter: brightness(0.8); /* Фото чуть темнеет при наведении */
+}
+
+/* --- МОДАЛЬНОЕ ОКНО ДЛЯ ПРОСМОТРА ФОТО --- */
+.lightbox {
+    display: none; 
+    position: fixed; 
+    z-index: 9999; 
+    left: 0; 
+    top: 0; 
+    width: 100%; 
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85); /* Темный фон */
+    backdrop-filter: blur(10px); /* Размытие заднего фона */
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    cursor: zoom-out; /* Курсор для закрытия */
+}
+
+.lightbox.active {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 1;
+}
+
+/* Сама картинка внутри просмотра */
+.lightbox img {
+    max-width: 90%;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 4px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    
+    /* Анимация расширения (зум) */
+    transform: scale(0.7);
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+}
+
+.lightbox.active img {
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* Кнопка закрытия */
+.lightbox-close {
+    position: absolute;
+    top: 30px;
+    right: 40px;
+    color: #fff;
+    font-size: 3rem;
+    cursor: pointer;
+    line-height: 1;
+    transition: transform 0.3s ease;
+}
+
+.lightbox-close:hover {
+    transform: scale(1.2);
+}
+
+@media (max-width: 768px) {
+    .lightbox img {
+        max-width: 95%;
+        max-height: 85vh;
+    }
+    .lightbox-close {
+        top: 15px;
+        right: 20px;
+        font-size: 2.5rem;
+    }
+}
