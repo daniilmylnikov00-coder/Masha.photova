@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio | Mariia Smirnova</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .gallery-header { text-align: center; padding: 100px 20px 40px; }
+        .gallery-header h1 { font-family: var(--font-heading); font-size: 4rem; }
+        .gallery-header a { color: #888; text-decoration: none; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 2px; }
+        
+        .insta-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            max-width: 1200px;
+            margin: 0 auto 100px;
+            padding: 0 20px;
+        }
+        .insta-grid img {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            transition: opacity 0.3s;
+        }
+        .insta-grid img:hover { opacity: 0.8; }
+
+        @media (max-width: 768px) {
+            .insta-grid { grid-template-columns: repeat(2, 1fr); gap: 5px; padding: 0 10px; }
+            .gallery-header h1 { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="gallery-header">
+        <a href="index.html">← Back to Home</a>
+        <h1>Portfolio</h1>
+        <p>All my latest work</p>
+    </div>
+
+    <div class="insta-grid" id="photo-grid">
+        <p style="text-align:center; grid-column: 1 / -1;">Loading photos...</p>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+        // Используйте те же ключи, что и в admin.html
+        const SUPABASE_URL = 'ВАШ_PROJECT_URL';
+        const SUPABASE_ANON_KEY = 'ВАШ_ANON_KEY';
+        
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function loadPhotos() {
+            const grid = document.getElementById('photo-grid');
+            
+            // Получаем список всех файлов из бакета 'photos'
+            const { data: files, error } = await supabase.storage
+                .from('photos')
+                .list('', {
+                    limit: 100,
+                    sortBy: { column: 'created_at', order: 'desc' } // Сначала новые
+                });
+
+            if (error) {
+                console.error(error);
+                grid.innerHTML = '<p>Error loading photos.</p>';
+                return;
+            }
+
+            if (!files || files.length === 0) {
+                grid.innerHTML = '<p style="text-align:center; grid-column: 1 / -1;">No photos yet. Upload some in the admin panel!</p>';
+                return;
+            }
+
+            grid.innerHTML = ''; // Очищаем
+
+            files.forEach(file => {
+                // Получаем публичную ссылку на каждое фото
+                const { data } = supabase.storage
+                    .from('photos')
+                    .getPublicUrl(file.name);
+
+                const img = document.createElement('img');
+                img.src = data.publicUrl;
+                img.alt = file.name;
+                grid.appendChild(img);
+            });
+        }
+
+        loadPhotos();
+    </script>
+</body>
+</html>
