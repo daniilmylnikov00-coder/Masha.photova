@@ -1,0 +1,320 @@
+/* Базовые настройки */
+:root {
+    --bg-color: #f9f8f6; /* Теплый белый */
+    --text-color: #1a1a1a;
+    --accent-color: #8c7a6b; /* Приглушенный коричневый/бежевый */
+    --font-heading: 'Cormorant Garamond', serif;
+    --font-body: 'Inter', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* Навигация */
+.navbar {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    padding: 30px 50px;
+    z-index: 10;
+}
+
+.logo h1 {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    color: #fff; /* Белый, так как на фоне фото */
+}
+
+.logo span {
+    font-size: 0.8rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #eee;
+}
+
+/* Hero Section (Первое фото) */
+.hero {
+    height: 100vh;
+    /* Замените ссылку на ваше фото с мостом (сохраните его в папку с сайтом) */
+    background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1449844908441-8829872d2607?q=80&w=1920&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #fff;
+    padding: 20px;
+}
+
+.hero-content h2 {
+    font-family: var(--font-heading);
+    font-size: 4rem;
+    font-weight: 400;
+    margin-bottom: 20px;
+    line-height: 1.2;
+}
+
+.hero-content p {
+    font-size: 1.1rem;
+    margin-bottom: 40px;
+    font-weight: 300;
+    letter-spacing: 1px;
+}
+
+/* Кнопки */
+.btn-primary, .btn-secondary {
+    padding: 15px 30px;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    margin: 0 10px;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-primary {
+    background-color: #fff;
+    color: #000;
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-color);
+    color: #fff;
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: #fff;
+    border: 1px solid #fff;
+}
+
+.btn-secondary:hover {
+    background-color: #fff;
+    color: #000;
+}
+
+/* Секции */
+.section {
+    padding: 120px 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.section-title {
+    font-family: var(--font-heading);
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.section-subtitle {
+    text-align: center;
+    color: #666;
+    margin-bottom: 60px;
+}
+
+/* Сетка мероприятий */
+.sessions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.session-card {
+    background: #fff;
+    padding: 40px;
+    border: 1px solid #eee;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.session-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.session-card h4 {
+    font-family: var(--font-heading);
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+}
+
+.session-card .date {
+    color: #888;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+
+.session-card .price {
+    font-weight: 500;
+    margin-bottom: 25px;
+}
+
+.session-card .btn-primary {
+    background-color: var(--text-color);
+    color: #fff;
+    width: 100%;
+}
+
+.session-card .btn-primary:hover {
+    background-color: var(--accent-color);
+}
+
+/* Блок Обо мне */
+.about-container {
+    display: flex;
+    align-items: center;
+    gap: 60px;
+}
+
+.about-image {
+    flex: 1;
+}
+
+.about-image img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+.about-text {
+    flex: 1;
+}
+
+.about-text h3 {
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+/* Модальное окно */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: var(--bg-color);
+    margin: 5% auto;
+    padding: 50px;
+    max-width: 600px;
+    position: relative;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+}
+
+.close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 2rem;
+    cursor: pointer;
+}
+
+.modal-content h3 {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.modal-content p {
+    margin-bottom: 30px;
+    color: #666;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 15px;
+    border: 1px solid #ddd;
+    background: #fff;
+    font-family: var(--font-body);
+    font-size: 1rem;
+}
+
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    outline: none;
+    border-color: var(--text-color);
+}
+
+.submit-btn {
+    width: 100%;
+    background-color: var(--text-color);
+    color: #fff;
+    margin: 10px 0 0 0;
+}
+
+/* Подвал */
+footer {
+    text-align: center;
+    padding: 40px;
+    background-color: #1a1a1a;
+    color: #fff;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.insta-link {
+    color: #fff;
+    text-decoration: underline;
+}
+
+/* --- АНИМАЦИИ --- */
+.fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.fade-in.appear {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Адаптив под телефоны */
+@media (max-width: 768px) {
+    .hero-content h2 { font-size: 2.5rem; }
+    .about-container { flex-direction: column; }
+    .modal-content { margin: 20% 10px; padding: 30px; }
+    .footer-content { flex-direction: column; gap: 20px; }
+}
