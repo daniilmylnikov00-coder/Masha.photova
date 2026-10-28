@@ -4,11 +4,30 @@ const SUPABASE_URL = 'https://olezthiuxjcuveduyxsg.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_5yXVeHuf370Cq4cnlyhTgQ_W6tknQzh';
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// ВАШ ПАРОЛЬ ДЛЯ ВХОДА
 const ADMIN_PASSWORD = "MashaAdmin2026"; 
 
 document.addEventListener("DOMContentLoaded", () => {
     
+    // === 0. СОЗДАЕМ ОКНО ДЛЯ ПРОСМОТРА ФОТО ===
+    const lightbox = document.createElement('div');
+    lightbox.className = 'lightbox';
+    lightbox.innerHTML = `
+        <span class="lightbox-close">&times;</span>
+        <img src="" alt="Full view">
+    `;
+    document.body.appendChild(lightbox);
+    
+    const lightboxImg = lightbox.querySelector('img');
+    const closeLightboxBtn = lightbox.querySelector('.lightbox-close');
+
+    // Закрытие по клику на фон или крестик
+    lightbox.addEventListener('click', (e) => {
+        if (e.target !== lightboxImg) {
+            lightbox.classList.remove('active');
+        }
+    });
+
+
     // === 1. АНИМАЦИИ ПОЯВЛЕНИЯ ===
     const faders = document.querySelectorAll('.fade-in');
     const appearOptions = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" };
@@ -21,6 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }, appearOptions);
     faders.forEach(fader => appearOnScroll.observe(fader));
 
+
     // === 2. ЛОГИКА ВХОДА (АДМИНКА) ===
     const loginBtn = document.getElementById('loginBtn');
     const loginModal = document.getElementById('loginModal');
@@ -29,24 +49,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const passwordInput = document.getElementById('passwordInput');
     const adminUploadZone = document.getElementById('admin-upload-zone');
 
-    // Проверяем, не залогинен ли уже админ (сохраняем в памяти браузера)
     if (localStorage.getItem('isAdmin') === 'true') {
         if(adminUploadZone) adminUploadZone.style.display = 'block';
         if(loginBtn) loginBtn.style.display = 'none';
     }
 
-    // Обработчики для окна логина
-    if (loginBtn) {
-        loginBtn.addEventListener('click', () => {
-            loginModal.style.display = 'block';
-        });
-    }
-
-    if (closeLogin) {
-        closeLogin.addEventListener('click', () => {
-            loginModal.style.display = 'none';
-        });
-    }
+    if (loginBtn) loginBtn.addEventListener('click', () => loginModal.style.display = 'block');
+    if (closeLogin) closeLogin.addEventListener('click', () => loginModal.style.display = 'none');
 
     if (submitLogin) {
         submitLogin.addEventListener('click', () => {
@@ -80,11 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    if (closeUpload) {
-        closeUpload.addEventListener('click', () => {
-            uploadModal.style.display = 'none';
-        });
-    }
+    if (closeUpload) closeUpload.addEventListener('click', () => uploadModal.style.display = 'none');
 
     if (doUploadBtn) {
         doUploadBtn.addEventListener('click', async () => {
@@ -110,7 +115,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 uploadStatus.textContent = "Success! Photo added.";
                 uploadStatus.style.color = "green";
                 
-                // Перезагружаем галереи
                 loadGallery('portraits', 'gallery-portraits');
                 loadGallery('couples', 'gallery-couples');
                 loadGallery('brand', 'gallery-brand');
@@ -127,7 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // === 4. ОТОБРАЖЕНИЕ ФОТО В АККОРДЕОНЕ ===
+    // === 4. ОТОБРАЖЕНИЕ ФОТО И LIGHTBOX ===
     async function loadGallery(category, containerId) {
         const container = document.getElementById(containerId);
         if (!container) return;
@@ -158,6 +162,13 @@ document.addEventListener("DOMContentLoaded", () => {
             const img = document.createElement('img');
             img.src = data.publicUrl;
             img.alt = file.name;
+            
+            // ДОБАВЛЯЕМ КЛИК ДЛЯ ПРОСМОТРА
+            img.addEventListener('click', () => {
+                lightboxImg.src = data.publicUrl;
+                lightbox.classList.add('active');
+            });
+
             container.appendChild(img);
         });
     }
