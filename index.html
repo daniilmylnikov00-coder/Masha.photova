@@ -4,18 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mariia Smirnova | Photographer</title>
-    <!-- Подключаем красивые шрифты от Google -->
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Навигация -->
+    <!-- Навигация с кнопкой входа -->
     <nav class="navbar">
         <div class="logo">
             <h1>MARIIA SMIRNOVA</h1>
             <span>Photography</span>
         </div>
+        <!-- Кнопка входа для вас -->
+        <button id="loginBtn" class="login-link">Login</button>
     </nav>
 
     <!-- Первый экран (Hero) -->
@@ -24,7 +25,6 @@
             <h2>Moments worth keeping.</h2>
             <p>Real moments. Warm light. Images you'll keep forever.</p>
             <div class="hero-buttons">
-                <!-- Кнопка теперь ведет в Instagram Direct -->
                 <a href="https://ig.me/m/masha.photova" target="_blank" class="btn-primary" style="text-decoration: none;">Check Availability</a>
                 <a href="#portfolio" class="btn-secondary">View Portfolio</a>
             </div>
@@ -34,23 +34,53 @@
     <!-- Блок Жанров (The Work) -->
     <section id="portfolio" class="section fade-in">
         <div class="container">
-            <h3 class="section-title">The Work</h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 class="section-title" style="margin: 0; text-align: left;">The Work</h3>
+                
+                <!-- Кнопка добавления фото (видна только админу) -->
+                <div id="admin-upload-zone" style="display: none;">
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                    <button id="uploadBtn" class="btn-primary" style="padding: 10px 20px; font-size: 0.8rem;">+ Add Photo</button>
+                </div>
+            </div>
+            
             <div class="work-list">
-                <a href="#" class="work-item">
-                    <span class="work-number">01</span>
-                    <span class="work-name">Portraits & Editorial</span>
-                    <span class="work-arrow">Explore →</span>
-                </a>
-                <a href="#" class="work-item">
-                    <span class="work-number">02</span>
-                    <span class="work-name">Couples & Engagements</span>
-                    <span class="work-arrow">Explore →</span>
-                </a>
-                <a href="#" class="work-item">
-                    <span class="work-number">03</span>
-                    <span class="work-name">Brand & Lifestyle</span>
-                    <span class="work-arrow">Explore →</span>
-                </a>
+                <!-- Жанр 1 -->
+                <details class="work-accordion">
+                    <summary class="work-item">
+                        <span class="work-number">01</span>
+                        <span class="work-name">Portraits & Editorial</span>
+                        <a href="gallery.html?type=portraits" class="work-arrow" onclick="event.stopPropagation()">Explore →</a>
+                    </summary>
+                    <div class="work-gallery" id="gallery-portraits">
+                        <!-- Сюда будут подгружаться ваши фото -->
+                        <p style="padding: 20px; color: #888;">Loading photos...</p>
+                    </div>
+                </details>
+
+                <!-- Жанр 2 -->
+                <details class="work-accordion">
+                    <summary class="work-item">
+                        <span class="work-number">02</span>
+                        <span class="work-name">Couples & Engagements</span>
+                        <a href="gallery.html?type=couples" class="work-arrow" onclick="event.stopPropagation()">Explore →</a>
+                    </summary>
+                    <div class="work-gallery" id="gallery-couples">
+                        <p style="padding: 20px; color: #888;">Loading photos...</p>
+                    </div>
+                </details>
+
+                <!-- Жанр 3 -->
+                <details class="work-accordion">
+                    <summary class="work-item">
+                        <span class="work-number">03</span>
+                        <span class="work-name">Brand & Lifestyle</span>
+                        <a href="gallery.html?type=brand" class="work-arrow" onclick="event.stopPropagation()">Explore →</a>
+                    </summary>
+                    <div class="work-gallery" id="gallery-brand">
+                        <p style="padding: 20px; color: #888;">Loading photos...</p>
+                    </div>
+                </details>
             </div>
         </div>
     </section>
@@ -59,7 +89,6 @@
     <section id="about" class="section fade-in">
         <div class="container about-container">
             <div class="about-image">
-                <!-- Ваше фото с камерой -->
                 <img src="Image/IMG_1490.jpeg" alt="Mariia Smirnova">
             </div>
             <div class="about-text">
@@ -77,7 +106,6 @@
             <p class="section-subtitle">Transparent pricing for a seamless experience.</p>
             
             <div class="pricing-grid">
-                <!-- Пакет 1 -->
                 <div class="pricing-card">
                     <h4>Essential</h4>
                     <div class="price">$350</div>
@@ -88,11 +116,9 @@
                         <li>Private online gallery</li>
                         <li>High-resolution files</li>
                     </ul>
-                    <!-- Кнопка теперь ведет в Instagram Direct -->
                     <a href="https://ig.me/m/masha.photova" target="_blank" class="btn-primary" style="width:100%; display:block; text-align:center; box-sizing:border-box; text-decoration: none;">Book Essential</a>
                 </div>
                 
-                <!-- Пакет 2 -->
                 <div class="pricing-card">
                     <h4>All-Inclusive</h4>
                     <div class="price">$550</div>
@@ -104,7 +130,6 @@
                         <li>70 professionally edited images</li>
                         <li>Private online gallery</li>
                     </ul>
-                    <!-- Кнопка теперь ведет в Instagram Direct -->
                     <a href="https://ig.me/m/masha.photova" target="_blank" class="btn-primary" style="width:100%; display:block; text-align:center; box-sizing:border-box; text-decoration: none;">Book All-Inclusive</a>
                 </div>
             </div>
@@ -141,6 +166,34 @@
             <a href="https://ig.me/m/masha.photova" target="_blank" class="insta-link">DM me on Instagram</a>
         </div>
     </footer>
+
+    <!-- Модальное окно для ВХОДА -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <span class="close" id="closeLogin">&times;</span>
+            <h3>Admin Login</h3>
+            <p>Enter your secret password.</p>
+            <input type="password" id="passwordInput" placeholder="Password" style="width: 100%; padding: 15px; margin-bottom: 20px; border: 1px solid #ddd;">
+            <button id="submitLogin" class="btn-primary" style="width: 100%;">Login</button>
+        </div>
+    </div>
+
+    <!-- Модальное окно для ЗАГРУЗКИ -->
+    <div id="uploadModal" class="modal">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <span class="close" id="closeUpload">&times;</span>
+            <h3>Upload Photo</h3>
+            <p>Select category and file.</p>
+            <select id="uploadCategory" style="width: 100%; padding: 15px; margin-bottom: 10px; border: 1px solid #ddd;">
+                <option value="portraits">Portraits & Editorial</option>
+                <option value="couples">Couples & Engagements</option>
+                <option value="brand">Brand & Lifestyle</option>
+            </select>
+            <input type="file" id="uploadFile" accept="image/*" style="width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ddd;">
+            <button id="doUploadBtn" class="btn-primary" style="width: 100%;">Upload Now</button>
+            <p id="uploadStatus" style="margin-top: 15px; font-weight: bold;"></p>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
