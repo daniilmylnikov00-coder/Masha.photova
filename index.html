@@ -58,7 +58,7 @@
     <section id="about" class="section fade-in">
         <div class="container about-container">
             <div class="about-image">
-                <!-- Сюда можно поставить ваше селфи с камерой -->
+                <!-- Ваше фото с камерой (убедитесь, что файл есть в папке Image) -->
                 <img src="Image/IMG_1490.jpeg" alt="Mariia Smirnova">
             </div>
             <div class="about-text">
@@ -70,7 +70,7 @@
     </section>
 
     <!-- Инвестиции (Цены) -->
-    <section id="pricing" class="section fade-in">
+    <section id="pricing" class="section fade-in bg-light">
         <div class="container">
             <h3 class="section-title">Investment</h3>
             <p class="section-subtitle">Transparent pricing for a seamless experience.</p>
@@ -109,7 +109,7 @@
     </section>
 
     <!-- Локации -->
-    <section id="locations" class="section fade-in bg-light">
+    <section id="locations" class="section fade-in">
         <div class="container">
             <h3 class="section-title">Where I photograph</h3>
             <p class="section-subtitle">Based in NoVa, traveling across DC, Maryland, and Virginia.</p>
@@ -138,7 +138,7 @@
             <h3>Let’s plan your shoot.</h3>
             <p>Fill out the details below, and I’ll get back to you within 24 hours.</p>
             
-            <!-- Форма отправляется через Formspree (замените action на свою ссылку) -->
+            <!-- Форма отправляется через Formspree -->
             <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST" id="bookingForm">
                 <div class="form-group">
                     <label for="name">Your Name</label>
@@ -150,13 +150,13 @@
                 </div>
                 <div class="form-group">
                     <label for="event">Event / Session Type</label>
-                    <!-- Сюда будет подставляться дата из карточки при нажатии -->
+                    <!-- Сюда мы вписали ваши даты и пакеты -->
                     <select id="event" name="event" required>
                         <option value="" disabled selected>Select a session...</option>
+                        <option value="Essential Package ($350)">Essential Package ($350)</option>
+                        <option value="All-Inclusive Package ($550)">All-Inclusive Package ($550)</option>
                         <option value="Georgetown Waterfront - Nov 15">Georgetown Waterfront - Nov 15</option>
                         <option value="Old Town Alexandria - Nov 23">Old Town Alexandria - Nov 23</option>
-                        <option value="Essential Package">Essential Package</option>
-                        <option value="All-Inclusive Package">All-Inclusive Package</option>
                         <option value="Custom Date / Other">Custom Date / Other</option>
                     </select>
                 </div>
@@ -180,75 +180,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
-/* =========================================
-   ОПТИМИЗАЦИЯ ПОД ПК (ДЕСКТОП)
-   ========================================= */
-
-@media (min-width: 1024px) {
-    /* Делаем шрифты крупнее и выразительнее на больших экранах */
-    .hero-content h2 {
-        font-size: 5.5rem;
-        max-width: 900px;
-        margin: 0 auto 20px auto;
-    }
-
-    .hero-content p {
-        font-size: 1.3rem;
-        max-width: 600px;
-        margin: 0 auto 40px auto;
-    }
-
-    .section-title {
-        font-size: 3.5rem;
-    }
-
-    /* Увеличиваем отступы, чтобы сайт "дышал" */
-    .section {
-        padding: 160px 40px;
-    }
-
-    /* Блок "Обо мне" на ПК: фото слева, текст справа */
-    .about-container {
-        flex-direction: row;
-        gap: 100px;
-    }
-
-    .about-image {
-        flex: 0 0 45%; /* Фото занимает 45% ширины */
-    }
-
-    .about-text {
-        flex: 0 0 55%;
-    }
-
-    .about-text h3 {
-        font-size: 3rem;
-    }
-
-    /* Сетки (цены, локации, карточки) выстраиваем в ряд */
-    .pricing-grid, 
-    .locations-grid, 
-    .sessions-grid {
-        grid-template-columns: repeat(3, 1fr); /* 3 колонки */
-        gap: 40px;
-    }
-
-    /* Эффект наведения на список жанров (The Work) */
-    .work-item:hover {
-        padding-left: 40px;
-        background-color: #fff;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
-    }
-
-    .work-name {
-        font-size: 3rem;
-    }
-
-    /* Модальное окно на ПК */
-    .modal-content {
-        margin: 8% auto;
-        max-width: 700px;
-        padding: 60px;
-    }
-}
