@@ -31,91 +31,107 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Проверяем, не залогинен ли уже админ (сохраняем в памяти браузера)
     if (localStorage.getItem('isAdmin') === 'true') {
-        adminUploadZone.style.display = 'block';
-        loginBtn.style.display = 'none'; // Прячем кнопку Login
+        if(adminUploadZone) adminUploadZone.style.display = 'block';
+        if(loginBtn) loginBtn.style.display = 'none';
     }
 
-    loginBtn.addEventListener('click', () => loginModal.style.display = 'block');
-    closeLogin.addEventListener('click', () => loginModal.style.display = 'none');
+    // Обработчики для окна логина
+    if (loginBtn) {
+        loginBtn.addEventListener('click', () => {
+            loginModal.style.display = 'block';
+        });
+    }
 
-    submitLogin.addEventListener('click', () => {
-        if (passwordInput.value === ADMIN_PASSWORD) {
-            localStorage.setItem('isAdmin', 'true');
-            adminUploadZone.style.display = 'block';
+    if (closeLogin) {
+        closeLogin.addEventListener('click', () => {
             loginModal.style.display = 'none';
-            loginBtn.style.display = 'none';
-            alert("Welcome back, Admin!");
-        } else {
-            alert("Wrong password!");
-            passwordInput.value = '';
-        }
-    });
+        });
+    }
+
+    if (submitLogin) {
+        submitLogin.addEventListener('click', () => {
+            if (passwordInput.value === ADMIN_PASSWORD) {
+                localStorage.setItem('isAdmin', 'true');
+                if(adminUploadZone) adminUploadZone.style.display = 'block';
+                loginModal.style.display = 'none';
+                if(loginBtn) loginBtn.style.display = 'none';
+                alert("Welcome back, Admin!");
+            } else {
+                alert("Wrong password!");
+                passwordInput.value = '';
+            }
+        });
+    }
 
     // === 3. ЗАГРУЗКА ФОТОГРАФИЙ ===
     const uploadModal = document.getElementById('uploadModal');
     const closeUpload = document.getElementById('closeUpload');
-    const uploadBtn = document.getElementById('uploadBtn'); // Кнопка + Add Photo
+    const uploadBtn = document.getElementById('uploadBtn'); 
     const doUploadBtn = document.getElementById('doUploadBtn');
     const uploadStatus = document.getElementById('uploadStatus');
     const uploadFile = document.getElementById('uploadFile');
     const uploadCategory = document.getElementById('uploadCategory');
 
-    uploadBtn.addEventListener('click', () => {
-        uploadModal.style.display = 'block';
-        uploadStatus.textContent = '';
-        uploadFile.value = '';
-    });
-    closeUpload.addEventListener('click', () => uploadModal.style.display = 'none');
+    if (uploadBtn) {
+        uploadBtn.addEventListener('click', () => {
+            uploadModal.style.display = 'block';
+            if(uploadStatus) uploadStatus.textContent = '';
+            if(uploadFile) uploadFile.value = '';
+        });
+    }
 
-    doUploadBtn.addEventListener('click', async () => {
-        const file = uploadFile.files[0];
-        const category = uploadCategory.value;
+    if (closeUpload) {
+        closeUpload.addEventListener('click', () => {
+            uploadModal.style.display = 'none';
+        });
+    }
 
-        if (!file) {
-            uploadStatus.textContent = "Please select a file.";
-            uploadStatus.style.color = "red";
-            return;
-        }
+    if (doUploadBtn) {
+        doUploadBtn.addEventListener('click', async () => {
+            const file = uploadFile.files[0];
+            const category = uploadCategory.value;
 
-        uploadStatus.textContent = "Uploading...";
-        uploadStatus.style.color = "black";
-        doUploadBtn.disabled = true;
+            if (!file) {
+                uploadStatus.textContent = "Please select a file.";
+                uploadStatus.style.color = "red";
+                return;
+            }
 
-        try {
-            // Сохраняем файл с именем: категория_время.jpg
-            const fileName = `${category}_${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
-            
-            const { data, error } = await supabase.storage
-                .from('photos')
-                .upload(fileName, file);
+            uploadStatus.textContent = "Uploading...";
+            uploadStatus.style.color = "black";
+            doUploadBtn.disabled = true;
 
-            if (error) throw error;
+            try {
+                const fileName = `${category}_${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+                const { data, error } = await supabase.storage.from('photos').upload(fileName, file);
 
-            uploadStatus.textContent = "Success! Photo added.";
-            uploadStatus.style.color = "green";
-            
-            // Перезагружаем галереи, чтобы показать новое фото
-            loadGallery('portraits', 'gallery-portraits');
-            loadGallery('couples', 'gallery-couples');
-            loadGallery('brand', 'gallery-brand');
+                if (error) throw error;
 
-            setTimeout(() => { uploadModal.style.display = 'none'; }, 1500);
+                uploadStatus.textContent = "Success! Photo added.";
+                uploadStatus.style.color = "green";
+                
+                // Перезагружаем галереи
+                loadGallery('portraits', 'gallery-portraits');
+                loadGallery('couples', 'gallery-couples');
+                loadGallery('brand', 'gallery-brand');
 
-        } catch (error) {
-            console.error(error);
-            uploadStatus.textContent = "Error: " + error.message;
-            uploadStatus.style.color = "red";
-        } finally {
-            doUploadBtn.disabled = false;
-        }
-    });
+                setTimeout(() => { uploadModal.style.display = 'none'; }, 1500);
+
+            } catch (error) {
+                console.error(error);
+                uploadStatus.textContent = "Error: " + error.message;
+                uploadStatus.style.color = "red";
+            } finally {
+                doUploadBtn.disabled = false;
+            }
+        });
+    }
 
     // === 4. ОТОБРАЖЕНИЕ ФОТО В АККОРДЕОНЕ ===
     async function loadGallery(category, containerId) {
         const container = document.getElementById(containerId);
         if (!container) return;
 
-        // Получаем список всех файлов
         const { data: files, error } = await supabase.storage
             .from('photos')
             .list('', {
@@ -128,7 +144,6 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // Фильтруем файлы по категории (в начале имени файла)
         const filteredFiles = files.filter(f => f.name.startsWith(category + '_'));
 
         if (filteredFiles.length === 0) {
@@ -136,7 +151,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        container.innerHTML = ''; // Очищаем
+        container.innerHTML = ''; 
 
         filteredFiles.forEach(file => {
             const { data } = supabase.storage.from('photos').getPublicUrl(file.name);
