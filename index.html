@@ -18,11 +18,11 @@
         </div>
     </nav>
 
-    <!-- Первый экран (Hero) с фото моста -->
+    <!-- Первый экран (Hero) -->
     <header class="hero fade-in">
         <div class="hero-content">
-            <h2>Capturing the extraordinary in the everyday.</h2>
-            <p>Editorial & Lifestyle Photography for those who love authentic stories. Based in NoVa & DC.</p>
+            <h2>Moments worth keeping.</h2>
+            <p>Real moments. Warm light. Images you'll keep forever.</p>
             <div class="hero-buttons">
                 <button class="btn-primary open-modal">Check Availability</button>
                 <a href="#portfolio" class="btn-secondary">View Portfolio</a>
@@ -30,8 +30,47 @@
         </div>
     </header>
 
+    <!-- Блок Жанров (The Work) -->
+    <section id="portfolio" class="section fade-in">
+        <div class="container">
+            <h3 class="section-title">The Work</h3>
+            <div class="work-list">
+                <a href="#" class="work-item">
+                    <span class="work-number">01</span>
+                    <span class="work-name">Portraits & Editorial</span>
+                    <span class="work-arrow">Explore →</span>
+                </a>
+                <a href="#" class="work-item">
+                    <span class="work-number">02</span>
+                    <span class="work-name">Couples & Engagements</span>
+                    <span class="work-arrow">Explore →</span>
+                </a>
+                <a href="#" class="work-item">
+                    <span class="work-number">03</span>
+                    <span class="work-name">Brand & Lifestyle</span>
+                    <span class="work-arrow">Explore →</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Блок Обо мне -->
+    <section id="about" class="section fade-in">
+        <div class="container about-container">
+            <div class="about-image">
+                <!-- Сюда можно поставить ваше селфи с камерой -->
+                <img src="https://images.unsplash.com/photo-1554048612-b6a482bc67e5?q=80&w=800&auto=format&fit=crop" alt="Mariia Smirnova">
+            </div>
+            <div class="about-text">
+                <h3>Nice to meet you.<br>I photograph what matters most.</h3>
+                <p>Hi, I'm Mariia — a photographer serving the NoVa & DC area. I specialize in portrait, couples, and lifestyle photography.</p>
+                <p>My sessions are calm, unhurried, and real. I don't pose people — I create space for them to just be themselves. That's where the best photos happen.</p>
+            </div>
+        </div>
+    </section>
+
     <!-- Блок Ближайшие съемки -->
-    <section id="upcoming" class="section fade-in">
+    <section id="upcoming" class="section fade-in bg-light">
         <div class="container">
             <h3 class="section-title">Upcoming Open Sessions</h3>
             <p class="section-subtitle">Reserve your spot for exclusive mini-sessions in unique locations. Limited slots available.</p>
@@ -59,16 +98,64 @@
         </div>
     </section>
 
-    <!-- Блок Обо мне -->
-    <section id="about" class="section fade-in">
-        <div class="container about-container">
-            <div class="about-image">
-                <!-- Сюда можно поставить ваше селфи с камерой -->
-                <img src="https://images.unsplash.com/photo-1554048612-b6a482bc67e5?q=80&w=800&auto=format&fit=crop" alt="Mariia Smirnova">
+    <!-- Инвестиции (Цены) -->
+    <section id="pricing" class="section fade-in">
+        <div class="container">
+            <h3 class="section-title">Investment</h3>
+            <p class="section-subtitle">Transparent pricing for a seamless experience.</p>
+            
+            <div class="pricing-grid">
+                <!-- Пакет 1 -->
+                <div class="pricing-card">
+                    <h4>Essential</h4>
+                    <div class="price">$350</div>
+                    <p class="package-desc">1-hour session</p>
+                    <ul class="features">
+                        <li>1-hour photography session</li>
+                        <li>50 professionally edited images</li>
+                        <li>Private online gallery</li>
+                        <li>High-resolution files</li>
+                    </ul>
+                    <button class="btn-primary open-modal" style="width:100%">Book Essential</button>
+                </div>
+                
+                <!-- Пакет 2 -->
+                <div class="pricing-card">
+                    <h4>All-Inclusive</h4>
+                    <div class="price">$550</div>
+                    <p class="package-desc">Full creative session</p>
+                    <ul class="features">
+                        <li>2-hour photography session</li>
+                        <li>Outfit change guidance</li>
+                        <li>Location scouting</li>
+                        <li>70 professionally edited images</li>
+                        <li>Private online gallery</li>
+                    </ul>
+                    <button class="btn-primary open-modal" style="width:100%">Book All-Inclusive</button>
+                </div>
             </div>
-            <div class="about-text">
-                <h3>Hi, I’m Mariia.</h3>
-                <p>I believe the best photographs aren’t perfectly posed—they’re felt. I’m a photographer who loves chasing good light, capturing raw emotion, and turning fleeting moments into timeless art. Whether we’re exploring the streets of DC or creating a styled editorial shoot, my goal is to make you look incredible and feel completely at ease in front of the lens.</p>
+        </div>
+    </section>
+
+    <!-- Локации -->
+    <section id="locations" class="section fade-in bg-light">
+        <div class="container">
+            <h3 class="section-title">Where I photograph</h3>
+            <p class="section-subtitle">Based in NoVa, traveling across DC, Maryland, and Virginia.</p>
+            
+            <div class="locations-grid">
+                <div class="location-card">
+                    <h4>Washington, DC</h4>
+                    <p>Georgetown · The Tidal Basin · National Mall · Capitol Hill · Meridian Hill Park</p>
+                </div>
+                <div class="location-card">
+                    <h4>Northern Virginia</h4>
+                    <p>Arlington · Alexandria · Old Town · McLean · Falls Church · Vienna</p>
+                </div>
+                <div class="location-card">
+                    <h4>Maryland</h4>
+                    <p>Bethesda · Chevy Chase · Silver Spring · Rockville · Potomac</p>
+                </div>
             </div>
         </div>
     </section>
@@ -97,6 +184,8 @@
                         <option value="" disabled selected>Select a session...</option>
                         <option value="Georgetown Waterfront - Nov 15">Georgetown Waterfront - Nov 15</option>
                         <option value="Old Town Alexandria - Nov 23">Old Town Alexandria - Nov 23</option>
+                        <option value="Essential Package">Essential Package</option>
+                        <option value="All-Inclusive Package">All-Inclusive Package</option>
                         <option value="Custom Date / Other">Custom Date / Other</option>
                     </select>
                 </div>
