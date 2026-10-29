@@ -15,10 +15,8 @@
             <h1>MARIIA SMIRNOVA</h1>
             <span>Photography</span>
         </div>
-        <div style="display:flex; gap: 20px;">
-            <button id="editPricingBtn" class="login-link" style="display:none;">+ Add Package</button>
-            <button id="loginBtn" class="login-link">Login</button>
-        </div>
+        <!-- Оставили только кнопку Login -->
+        <button id="loginBtn" class="login-link">Login</button>
     </nav>
 
     <!-- Первый экран (Hero) -->
@@ -87,11 +85,15 @@
         </div>
     </section>
 
-    <!-- Инвестиции (Цены) - ТЕПЕРЬ ДИНАМИЧЕСКИЕ -->
+    <!-- Инвестиции (Цены) -->
     <section id="pricing" class="section fade-in bg-light">
         <div class="container">
-            <h3 class="section-title">Investment</h3>
-            <p class="section-subtitle">Transparent pricing for a seamless experience.</p>
+            <!-- Кнопка добавления теперь прямо в блоке цен -->
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h3 class="section-title" style="margin-bottom: 10px;">Investment</h3>
+                <button id="editPricingBtn" class="btn-secondary" style="display:none; border-color: #1a1a1a; color: #1a1a1a; padding: 10px 20px; font-size: 0.8rem;">+ Add New Package</button>
+            </div>
+            <p class="section-subtitle" style="margin-top: -10px;">Transparent pricing for a seamless experience.</p>
             
             <!-- Сюда скрипт вставит карточки из базы -->
             <div class="pricing-grid" id="pricing-container">
