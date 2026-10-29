@@ -8,15 +8,61 @@ const ADMIN_PASSWORD = "MashaAdmin2026";
 
 document.addEventListener("DOMContentLoaded", () => {
     
-    // === 0. LIGHTBOX ДЛЯ ФОТО ===
+    // === 0. LIGHTBOX ДЛЯ ФОТО СО СТРЕЛКАМИ ===
     const lightbox = document.createElement('div');
     lightbox.className = 'lightbox';
-    lightbox.innerHTML = `<span class="lightbox-close">&times;</span><img src="" alt="Full view">`;
+    lightbox.innerHTML = `
+        <button class="lightbox-nav lightbox-prev">&#10094;</button>
+        <img src="" alt="Full view">
+        <button class="lightbox-nav lightbox-next">&#10095;</button>
+        <span class="lightbox-close">&times;</span>
+    `;
     document.body.appendChild(lightbox);
-    const lightboxImg = lightbox.querySelector('img');
     
+    const lightboxImg = lightbox.querySelector('img');
+    const btnPrev = lightbox.querySelector('.lightbox-prev');
+    const btnNext = lightbox.querySelector('.lightbox-next');
+    
+    // Переменные для хранения текущей галереи и индекса
+    let currentGallery = [];
+    let currentIndex = 0;
+
+    // Функция показа фото по индексу
+    function showImage(index) {
+        if (currentGallery.length === 0) return;
+        
+        // Зацикливаем листание (если дошли до конца - идем в начало)
+        if (index < 0) index = currentGallery.length - 1;
+        if (index >= currentGallery.length) index = 0;
+        
+        currentIndex = index;
+        lightboxImg.src = currentGallery[currentIndex];
+    }
+
+    // Навешиваем события на стрелки
+    btnPrev.addEventListener('click', (e) => {
+        e.stopPropagation(); // Чтобы клик по стрелке не закрывал окно
+        showImage(currentIndex - 1);
+    });
+
+    btnNext.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showImage(currentIndex + 1);
+    });
+
+    // Закрытие окна по клику на пустое место или крестик
     lightbox.addEventListener('click', (e) => {
-        if (e.target !== lightboxImg) lightbox.classList.remove('active');
+        if (e.target === lightbox || e.target.classList.contains('lightbox-close')) {
+            lightbox.classList.remove('active');
+        }
+    });
+
+    // Управление с клавиатуры (стрелки влево/вправо)
+    document.addEventListener('keydown', (e) => {
+        if (!lightbox.classList.contains('active')) return;
+        if (e.key === 'ArrowLeft') showImage(currentIndex - 1);
+        if (e.key === 'ArrowRight') showImage(currentIndex + 1);
+        if (e.key === 'Escape') lightbox.classList.remove('active');
     });
 
     // === 1. АНИМАЦИИ ===
@@ -47,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if(adminUploadZone) adminUploadZone.style.display = 'block';
             if(addPricingBtn) addPricingBtn.style.display = 'inline-block';
             if(editAboutBtn) editAboutBtn.style.display = 'flex';
-            if(editHeroBtn) editHeroBtn.style.display = 'flex'; // Показываем карандаш на главном экране
+            if(editHeroBtn) editHeroBtn.style.display = 'flex';
             if(loginBtn) loginBtn.style.display = 'none';
         }
     }
@@ -137,14 +183,24 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             container.innerHTML = ''; 
             
+            // Собираем все ссылки в массив для этого контейнера
+            const galleryUrls = [];
+
             filteredFiles.forEach(file => {
                 const { data } = supabase.storage.from('photos').getPublicUrl(file.name);
+                galleryUrls.push(data.publicUrl); // Добавляем в массив
+                
                 const wrapper = document.createElement('div');
                 wrapper.className = 'photo-wrapper';
                 const img = document.createElement('img');
                 img.src = data.publicUrl;
+                
+                // При клике передаем массив картинок и индекс текущей
                 img.addEventListener('click', () => {
-                    lightboxImg.src = data.publicUrl;
+                    currentGallery = galleryUrls;
+                    // Находим индекс кликнутого фото в общем массиве
+                    currentIndex = galleryUrls.indexOf(data.publicUrl);
+                    showImage(currentIndex);
                     lightbox.classList.add('active');
                 });
                 wrapper.appendChild(img);
@@ -296,7 +352,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 aboutTitle.innerHTML = data.title || "Nice to meet you.<br>I photograph what matters most.";
                 aboutP1.textContent = data.paragraph1 || "";
                 aboutP2.textContent = data.paragraph2 || "";
-                if (data.image_url) aboutImg.src = data.image_url;
+                
+                if (data.image_url && data.image_url.trim() !== "") {
+                    aboutImg.src = data.image_url;
+                } else {
+                    aboutImg.src = "Image/IMG_1490.jpeg";
+                }
+
                 if(aboutTitleInput) aboutTitleInput.value = (data.title || "").replace(/<br>/g, '\n');
                 if(aboutP1Input) aboutP1Input.value = data.paragraph1 || "";
                 if(aboutP2Input) aboutP2Input.value = data.paragraph2 || "";
@@ -305,6 +367,7 @@ document.addEventListener("DOMContentLoaded", () => {
             aboutTitle.innerHTML = "Nice to meet you.<br>I photograph what matters most.";
             aboutP1.textContent = "Hi, I'm Mariia — a photographer serving the NoVa & DC area.";
             aboutP2.textContent = "My sessions are calm, unhurried, and real.";
+            aboutImg.src = "Image/IMG_1490.jpeg";
         }
     }
     loadAbout();
