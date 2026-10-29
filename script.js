@@ -57,6 +57,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 if(addPricingBtn) addPricingBtn.style.display = 'inline-block';
                 loginModal.style.display = 'none';
                 if(loginBtn) loginBtn.style.display = 'none';
+                
+                // Перезагружаем галереи и цены, чтобы появились кнопки редактирования
+                loadGallery('portraits', 'gallery-portraits');
+                loadGallery('couples', 'gallery-couples');
+                loadGallery('brand', 'gallery-brand');
                 loadPricing(); 
             } else {
                 alert("Wrong password!");
@@ -111,28 +116,75 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // === 4. ОТОБРАЖЕНИЕ ФОТО ===
+    // === 4. ОТОБРАЖЕНИЕ ФОТО И УДАЛЕНИЕ ===
     async function loadGallery(category, containerId) {
         const container = document.getElementById(containerId);
         if (!container) return;
+        
+        const isAdmin = localStorage.getItem('isAdmin') === 'true';
+        
         const { data: files } = await supabase.storage.from('photos').list('', { limit: 100, sortBy: { column: 'created_at', order: 'desc' } });
         const filteredFiles = files.filter(f => f.name.startsWith(category + '_'));
+        
         if (filteredFiles.length === 0) {
             container.innerHTML = '<p style="padding: 20px; color: #888;">No photos yet.</p>';
             return;
         }
+        
         container.innerHTML = ''; 
+        
         filteredFiles.forEach(file => {
             const { data } = supabase.storage.from('photos').getPublicUrl(file.name);
+            
+            // Создаем обертку для фото
+            const wrapper = document.createElement('div');
+            wrapper.className = 'photo-wrapper';
+            
             const img = document.createElement('img');
             img.src = data.publicUrl;
+            
+            // Клик для увеличения
             img.addEventListener('click', () => {
                 lightboxImg.src = data.publicUrl;
                 lightbox.classList.add('active');
             });
-            container.appendChild(img);
+            
+            wrapper.appendChild(img);
+
+            // Если админ, добавляем кнопку удаления
+            if (isAdmin) {
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-photo-btn';
+                deleteBtn.innerHTML = '&times;'; // Крестик
+                deleteBtn.title = "Delete photo";
+                
+                deleteBtn.addEventListener('click', async (e) => {
+                    e.stopPropagation(); // Чтобы не открывался лайтбокс
+                    
+                    if (confirm("Are you sure you want to delete this photo?")) {
+                        deleteBtn.innerHTML = '...';
+                        
+                        // Удаляем файл из хранилища Supabase
+                        const { error } = await supabase.storage.from('photos').remove([file.name]);
+                        
+                        if (error) {
+                            alert("Error deleting: " + error.message);
+                            deleteBtn.innerHTML = '&times;';
+                        } else {
+                            // Удаляем фото с экрана
+                            wrapper.remove(); 
+                        }
+                    }
+                });
+                
+                wrapper.appendChild(deleteBtn);
+            }
+
+            container.appendChild(wrapper);
         });
     }
+    
+    // Первичная загрузка галерей
     loadGallery('portraits', 'gallery-portraits');
     loadGallery('couples', 'gallery-couples');
     loadGallery('brand', 'gallery-brand');
