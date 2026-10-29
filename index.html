@@ -20,12 +20,15 @@
 
     <!-- Первый экран (Hero) -->
     <header class="hero fade-in">
+        <!-- Кнопка редактирования (карандаш) -->
+        <button id="editHeroBtn" class="edit-package-btn" style="display: none; position: absolute; top: 100px; right: 40px; background: rgba(255,255,255,0.2); color: #fff;">✏️</button>
+
         <div class="hero-content">
-            <h2>Moments worth keeping.</h2>
-            <p>Real moments. Warm light. Images you'll keep forever.</p>
+            <h2 id="hero-title">Moments worth keeping.</h2>
+            <p id="hero-subtitle">Real moments. Warm light. Images you'll keep forever.</p>
             <div class="hero-buttons">
-                <a href="https://ig.me/m/masha.photova" target="_blank" class="btn-primary" style="text-decoration: none;">Check Availability</a>
-                <a href="#portfolio" class="btn-secondary">View Portfolio</a>
+                <a href="https://ig.me/m/masha.photova" target="_blank" class="btn-primary" style="text-decoration: none;" id="hero-btn1">Check Availability</a>
+                <a href="#portfolio" class="btn-secondary" id="hero-btn2">View Portfolio</a>
             </div>
         </div>
     </header>
@@ -76,11 +79,10 @@
             <button id="editAboutBtn" class="edit-package-btn" style="display: none; top: 0; right: 0;">✏️</button>
             
             <div class="about-image">
-                <!-- Сюда скрипт вставит ссылку из базы -->
-                <img id="about-img" src="Image/photo.png" alt="Mariia Smirnova">
+                <img id="about-img" src="Image/IMG_1490.jpeg" alt="Mariia Smirnova">
             </div>
             <div class="about-text">
-                <h3 id="about-title"></h3>
+                <h3 id="about-title">Loading...</h3>
                 <p id="about-p1"></p>
                 <p id="about-p2"></p>
             </div>
@@ -168,7 +170,6 @@
             <span class="close" id="closeAbout">&times;</span>
             <h3>Edit About Section</h3>
             
-            <!-- Загрузка фото для блока "Обо мне" -->
             <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #ddd; text-align: center;">
                 <p style="margin-bottom: 10px; font-weight: bold;">Update Photo</p>
                 <input type="file" id="aboutImgInput" accept="image/*" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd;">
@@ -181,6 +182,19 @@
             <textarea id="aboutP2Input" rows="4" placeholder="Second paragraph" style="width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd;"></textarea>
             
             <button id="saveAboutBtn" class="btn-primary" style="width: 100%;">Save Changes</button>
+        </div>
+    </div>
+
+    <!-- Модальное окно РЕДАКТИРОВАНИЯ ГЛАВНОГО ЭКРАНА (HERO) -->
+    <div id="heroModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <span class="close" id="closeHero">&times;</span>
+            <h3>Edit Hero Section</h3>
+            <textarea id="heroTitleInput" rows="2" placeholder="Main Title" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; font-family: 'Cormorant Garamond', serif; font-size: 1.5rem;"></textarea>
+            <input type="text" id="heroSubtitleInput" placeholder="Subtitle" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd;">
+            <input type="text" id="heroBtn1Input" placeholder="Button 1 Text" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd;">
+            <input type="text" id="heroBtn2Input" placeholder="Button 2 Text" style="width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd;">
+            <button id="saveHeroBtn" class="btn-primary" style="width: 100%;">Save Changes</button>
         </div>
     </div>
 
