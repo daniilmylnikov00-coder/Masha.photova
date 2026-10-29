@@ -8,8 +8,9 @@
     <link rel="stylesheet" href="style.css">
     <style>
         .gallery-header { text-align: center; padding: 100px 20px 40px; }
-        .gallery-header h1 { font-family: var(--font-heading); font-size: 4rem; }
-        .gallery-header a { color: #888; text-decoration: none; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 2px; }
+        .gallery-header h1 { font-family: var(--font-heading); font-size: 4rem; text-transform: capitalize; }
+        .gallery-header a { color: #888; text-decoration: none; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 2px; transition: color 0.3s; }
+        .gallery-header a:hover { color: #1a1a1a; }
         
         .insta-grid {
             display: grid;
@@ -32,13 +33,38 @@
             .insta-grid { grid-template-columns: repeat(2, 1fr); gap: 5px; padding: 0 10px; }
             .gallery-header h1 { font-size: 2.5rem; }
         }
+
+        /* Стили для стрелок (на случай, если они не подтянулись из style.css) */
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            border: none;
+            font-size: 3rem;
+            padding: 20px 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10000;
+            border-radius: 5px;
+            user-select: none;
+        }
+        .lightbox-nav:hover { background: rgba(255, 255, 255, 0.2); color: #fff; }
+        .lightbox-prev { left: 20px; }
+        .lightbox-next { right: 20px; }
+        @media (max-width: 768px) {
+            .lightbox-nav { font-size: 2rem; padding: 15px; }
+            .lightbox-prev { left: 10px; }
+            .lightbox-next { right: 10px; }
+        }
     </style>
 </head>
 <body>
 
     <div class="gallery-header">
         <a href="index.html">← Back to Home</a>
-        <h1>Portfolio</h1>
+        <h1 id="gallery-title">Portfolio</h1>
         <p>All my latest work</p>
     </div>
 
@@ -46,10 +72,12 @@
         <p style="text-align:center; grid-column: 1 / -1;">Loading photos...</p>
     </div>
 
-    <!-- Окно для просмотра фото -->
+    <!-- Окно для просмотра фото (Lightbox) -->
     <div id="lightbox" class="lightbox">
-        <span class="lightbox-close">&times;</span>
+        <button class="lightbox-nav lightbox-prev">&#10094;</button>
         <img src="" alt="Full view">
+        <button class="lightbox-nav lightbox-next">&#10095;</button>
+        <span class="lightbox-close">&times;</span>
     </div>
 
     <script type="module">
@@ -62,21 +90,46 @@
         const grid = document.getElementById('photo-grid');
         const lightbox = document.getElementById('lightbox');
         const lightboxImg = lightbox.querySelector('img');
+        const btnPrev = lightbox.querySelector('.lightbox-prev');
+        const btnNext = lightbox.querySelector('.lightbox-next');
+        const closeBtn = lightbox.querySelector('.lightbox-close');
 
-        // Закрытие лайтбокса
+        let currentGallery = [];
+        let currentIndex = 0;
+
+        // Функция показа фото
+        function showImage(index) {
+            if (currentGallery.length === 0) return;
+            if (index < 0) index = currentGallery.length - 1;
+            if (index >= currentGallery.length) index = 0;
+            
+            currentIndex = index;
+            lightboxImg.src = currentGallery[currentIndex];
+        }
+
+        // Обработчики стрелок
+        btnPrev.addEventListener('click', (e) => { e.stopPropagation(); showImage(currentIndex - 1); });
+        btnNext.addEventListener('click', (e) => { e.stopPropagation(); showImage(currentIndex + 1); });
+
+        // Закрытие
+        closeBtn.addEventListener('click', () => lightbox.classList.remove('active'));
         lightbox.addEventListener('click', (e) => {
-            if (e.target !== lightboxImg) {
-                lightbox.classList.remove('active');
-            }
+            if (e.target === lightbox) lightbox.classList.remove('active');
+        });
+
+        // Управление с клавиатуры
+        document.addEventListener('keydown', (e) => {
+            if (!lightbox.classList.contains('active')) return;
+            if (e.key === 'ArrowLeft') showImage(currentIndex - 1);
+            if (e.key === 'ArrowRight') showImage(currentIndex + 1);
+            if (e.key === 'Escape') lightbox.classList.remove('active');
         });
 
         async function loadPhotos() {
-            // Получаем параметр из URL (например, ?type=portraits)
             const urlParams = new URLSearchParams(window.location.search);
             const category = urlParams.get('type') || 'portraits'; 
             
-            // Меняем заголовок в зависимости от категории
-            document.querySelector('.gallery-header h1').innerText = category.charAt(0).toUpperCase() + category.slice(1);
+            document.getElementById('gallery-title').innerText = category;
 
             const { data: files, error } = await supabase.storage
                 .from('photos')
@@ -87,7 +140,6 @@
                 return;
             }
 
-            // Фильтруем фото по категории
             const filteredFiles = files.filter(f => f.name.startsWith(category + '_'));
 
             if (filteredFiles.length === 0) {
@@ -96,16 +148,20 @@
             }
 
             grid.innerHTML = '';
+            currentGallery = []; // Сбрасываем массив
 
             filteredFiles.forEach(file => {
                 const { data } = supabase.storage.from('photos').getPublicUrl(file.name);
+                currentGallery.push(data.publicUrl); // Собираем все ссылки
+                
                 const img = document.createElement('img');
                 img.src = data.publicUrl;
                 img.alt = file.name;
                 
                 // Клик для увеличения
                 img.addEventListener('click', () => {
-                    lightboxImg.src = data.publicUrl;
+                    currentIndex = currentGallery.indexOf(data.publicUrl);
+                    showImage(currentIndex);
                     lightbox.classList.add('active');
                 });
 
