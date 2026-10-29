@@ -330,3 +330,26 @@ footer { text-align: center; padding: 40px; background-color: #1a1a1a; color: #f
     background: #fff;
     color: #000;
 }
+
+/* Стили для кнопки редактирования (карандаш) */
+.edit-package-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(0,0,0,0.05);
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.edit-package-btn:hover {
+    background: #1a1a1a;
+    transform: scale(1.1);
+}
