@@ -72,14 +72,19 @@
 
     <!-- Блок Обо мне -->
     <section id="about" class="section fade-in">
-        <div class="container about-container">
+        <div class="container about-container" style="position: relative;">
+            
+            <!-- Кнопка редактирования (карандаш) -->
+            <button id="editAboutBtn" class="edit-package-btn" style="display: none; top: 0; right: 0;">✏️</button>
+
             <div class="about-image">
                 <img src="Image/IMG_1490.jpeg" alt="Mariia Smirnova">
             </div>
             <div class="about-text">
-                <h3>Nice to meet you.<br>I photograph what matters most.</h3>
-                <p>Hi, I'm Mariia — a photographer serving the NoVa & DC area. I specialize in portrait, couples, and lifestyle photography.</p>
-                <p>My sessions are calm, unhurried, and real. I don't pose people — I create space for them to just be themselves. That's where the best photos happen.</p>
+                <!-- Сюда скрипт вставит текст из базы -->
+                <h3 id="about-title"></h3>
+                <p id="about-p1"></p>
+                <p id="about-p2"></p>
             </div>
         </div>
     </section>
@@ -89,7 +94,6 @@
         <div class="container">
             <div style="text-align: center; margin-bottom: 20px;">
                 <h3 class="section-title" style="margin-bottom: 10px;">Investment</h3>
-                <!-- Кнопка добавления -->
                 <button id="addPricingBtn" class="btn-secondary" style="display:none; border-color: #1a1a1a; color: #1a1a1a; padding: 10px 20px; font-size: 0.8rem;">+ Add New Package</button>
             </div>
             <p class="section-subtitle" style="margin-top: -10px;">Transparent pricing for a seamless experience.</p>
@@ -154,15 +158,24 @@
         <div class="modal-content" style="max-width: 500px;">
             <span class="close" id="closePackage">&times;</span>
             <h3 id="packageModalTitle">Add New Package</h3>
-            
-            <!-- Скрытое поле для ID (чтобы понимать, редактируем мы или создаем) -->
             <input type="hidden" id="pkgId">
-            
             <input type="text" id="pkgTitle" placeholder="Title (e.g. Premium)" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd;">
             <input type="text" id="pkgPrice" placeholder="Price (e.g. $800)" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd;">
             <input type="text" id="pkgDesc" placeholder="Short description (e.g. 3-hour session)" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd;">
             <textarea id="pkgFeatures" placeholder="Features (one per line)" style="width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd; height: 100px;"></textarea>
             <button id="savePackageBtn" class="btn-primary" style="width: 100%;">Save Package</button>
+        </div>
+    </div>
+
+    <!-- Модальное окно РЕДАКТИРОВАНИЯ БЛОКА ОБО МНЕ -->
+    <div id="aboutModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <span class="close" id="closeAbout">&times;</span>
+            <h3>Edit About Section</h3>
+            <textarea id="aboutTitleInput" rows="2" placeholder="Title" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; font-family: 'Cormorant Garamond', serif; font-size: 1.2rem;"></textarea>
+            <textarea id="aboutP1Input" rows="4" placeholder="First paragraph" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd;"></textarea>
+            <textarea id="aboutP2Input" rows="4" placeholder="Second paragraph" style="width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd;"></textarea>
+            <button id="saveAboutBtn" class="btn-primary" style="width: 100%;">Save Changes</button>
         </div>
     </div>
 
