@@ -406,3 +406,27 @@ footer { text-align: center; padding: 40px; background-color: #1a1a1a; color: #f
     border-radius: 4px;
     transition: transform 0.3s ease;
 }
+
+/* Карандаш для блока Обо мне */
+#editAboutBtn {
+    position: absolute;
+    top: 0;
+    right: 20px;
+    background: rgba(0,0,0,0.05);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+#editAboutBtn:hover {
+    background: #1a1a1a;
+    transform: scale(1.1);
+}
