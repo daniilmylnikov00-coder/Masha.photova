@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (passwordInput.value === ADMIN_PASSWORD) {
                 localStorage.setItem('isAdmin', 'true');
                 loginModal.style.display = 'none';
-                checkAdmin(); // Обновляем видимость кнопок
+                checkAdmin(); 
                 loadGallery('portraits', 'gallery-portraits');
                 loadGallery('couples', 'gallery-couples');
                 loadGallery('brand', 'gallery-brand');
@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // === 3. ЗАГРУЗКА ФОТО ===
+    // === 3. ЗАГРУЗКА ФОТО В ГАЛЕРЕЮ ===
     const uploadModal = document.getElementById('uploadModal');
     const closeUpload = document.getElementById('closeUpload');
     const uploadBtn = document.getElementById('uploadBtn'); 
@@ -121,7 +121,6 @@ document.addEventListener("DOMContentLoaded", () => {
     async function loadGallery(category, containerId) {
         const container = document.getElementById(containerId);
         if (!container) return;
-        
         const isAdmin = localStorage.getItem('isAdmin') === 'true';
         
         const { data: files } = await supabase.storage.from('photos').list('', { limit: 100, sortBy: { column: 'created_at', order: 'desc' } });
@@ -131,23 +130,18 @@ document.addEventListener("DOMContentLoaded", () => {
             container.innerHTML = '<p style="padding: 20px; color: #888;">No photos yet.</p>';
             return;
         }
-        
         container.innerHTML = ''; 
         
         filteredFiles.forEach(file => {
             const { data } = supabase.storage.from('photos').getPublicUrl(file.name);
-            
             const wrapper = document.createElement('div');
             wrapper.className = 'photo-wrapper';
-            
             const img = document.createElement('img');
             img.src = data.publicUrl;
-            
             img.addEventListener('click', () => {
                 lightboxImg.src = data.publicUrl;
                 lightbox.classList.add('active');
             });
-            
             wrapper.appendChild(img);
 
             if (isAdmin) {
@@ -155,7 +149,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 deleteBtn.className = 'delete-photo-btn';
                 deleteBtn.innerHTML = '&times;';
                 deleteBtn.title = "Delete photo";
-                
                 deleteBtn.addEventListener('click', async (e) => {
                     e.stopPropagation();
                     if (confirm("Are you sure you want to delete this photo?")) {
@@ -174,7 +167,6 @@ document.addEventListener("DOMContentLoaded", () => {
             container.appendChild(wrapper);
         });
     }
-    
     loadGallery('portraits', 'gallery-portraits');
     loadGallery('couples', 'gallery-couples');
     loadGallery('brand', 'gallery-brand');
@@ -269,7 +261,8 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // === 6. РЕДАКТИРОВАНИЕ БЛОКА ОБО МНЕ ===
+    // === 6. РЕДАКТИРОВАНИЕ БЛОКА ОБО МНЕ (ТЕКСТ + ФОТО) ===
+    const aboutImg = document.getElementById('about-img');
     const aboutTitle = document.getElementById('about-title');
     const aboutP1 = document.getElementById('about-p1');
     const aboutP2 = document.getElementById('about-p2');
@@ -280,7 +273,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const aboutP1Input = document.getElementById('aboutP1Input');
     const aboutP2Input = document.getElementById('aboutP2Input');
 
-    // Загрузка текста из базы
+    const aboutImgInput = document.getElementById('aboutImgInput');
+    const uploadAboutImgBtn = document.getElementById('uploadAboutImgBtn');
+    const aboutUploadStatus = document.getElementById('aboutUploadStatus');
+
+    // Загрузка текста и фото из базы
     async function loadAbout() {
         const { data, error } = await supabase.from('about_settings').select('*').limit(1).single();
         if (data) {
@@ -288,7 +285,10 @@ document.addEventListener("DOMContentLoaded", () => {
             aboutP1.textContent = data.paragraph1 || "";
             aboutP2.textContent = data.paragraph2 || "";
             
-            // Заполняем скрытые поля для редактирования
+            if (data.image_url) {
+                aboutImg.src = data.image_url; // Если есть загруженное фото, ставим его
+            }
+
             if(aboutTitleInput) aboutTitleInput.value = (data.title || "").replace(/<br>/g, '\n');
             if(aboutP1Input) aboutP1Input.value = data.paragraph1 || "";
             if(aboutP2Input) aboutP2Input.value = data.paragraph2 || "";
@@ -296,19 +296,57 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     loadAbout();
 
-    // Открытие окна редактирования
-    if (editAboutBtn) {
-        editAboutBtn.addEventListener('click', () => {
-            aboutModal.style.display = 'block';
+    if (editAboutBtn) editAboutBtn.addEventListener('click', () => {
+        aboutUploadStatus.textContent = "";
+        aboutImgInput.value = "";
+        aboutModal.style.display = 'block';
+    });
+    if (closeAbout) closeAbout.addEventListener('click', () => aboutModal.style.display = 'none');
+
+    // Загрузка нового фото для блока "Обо мне"
+    if (uploadAboutImgBtn) {
+        uploadAboutImgBtn.addEventListener('click', async () => {
+            const file = aboutImgInput.files[0];
+            if (!file) return aboutUploadStatus.textContent = "Please select a file.";
+
+            aboutUploadStatus.textContent = "Uploading image...";
+            aboutUploadStatus.style.color = "black";
+            uploadAboutImgBtn.disabled = true;
+
+            try {
+                // Генерируем уникальное имя файла
+                const fileName = `about_${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+                
+                // Загружаем в тот же бакет 'photos', но с префиксом 'about_'
+                const { error: uploadError } = await supabase.storage.from('photos').upload(fileName, file);
+                if (uploadError) throw uploadError;
+
+                // Получаем публичную ссылку
+                const { data: urlData } = supabase.storage.from('photos').getPublicUrl(fileName);
+                
+                // Сохраняем ссылку в таблицу about_settings
+                const { error: dbError } = await supabase.from('about_settings').update({ image_url: urlData.publicUrl }).eq('id', 1);
+                if (dbError) throw dbError;
+
+                aboutUploadStatus.textContent = "Photo updated successfully!";
+                aboutUploadStatus.style.color = "green";
+                aboutImg.src = urlData.publicUrl; // Обновляем фото на странице сразу
+
+            } catch (error) {
+                console.error(error);
+                aboutUploadStatus.textContent = "Error: " + error.message;
+                aboutUploadStatus.style.color = "red";
+            } finally {
+                uploadAboutImgBtn.disabled = false;
+            }
         });
     }
-    if (closeAbout) closeAbout.addEventListener('click', () => aboutModal.style.display = 'none');
 
     // Сохранение текста
     if (saveAboutBtn) {
         saveAboutBtn.addEventListener('click', async () => {
             saveAboutBtn.disabled = true;
-            saveAboutBtn.textContent = "Saving...";
+            saveAboutBtn.textContent = "Saving text...";
             
             const newTitle = aboutTitleInput.value.replace(/\n/g, '<br>');
             const newP1 = aboutP1Input.value;
@@ -318,7 +356,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 title: newTitle,
                 paragraph1: newP1,
                 paragraph2: newP2
-            }).eq('id', 1); // Обновляем первую (и единственную) запись
+            }).eq('id', 1);
 
             saveAboutBtn.disabled = false;
             saveAboutBtn.textContent = "Save Changes";
@@ -331,4 +369,5 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+});
 });
