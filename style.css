@@ -430,3 +430,18 @@ footer { text-align: center; padding: 40px; background-color: #1a1a1a; color: #f
     background: #1a1a1a;
     transform: scale(1.1);
 }
+
+/* Делаем карандаш на главном экране заметным */
+#editHeroBtn {
+    background-color: #ffffff !important;
+    color: #1a1a1a !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    border: 1px solid #ddd;
+    z-index: 100;
+}
+
+#editHeroBtn:hover {
+    background-color: #8c7a6b !important;
+    color: #ffffff !important;
+    transform: scale(1.1);
+}
