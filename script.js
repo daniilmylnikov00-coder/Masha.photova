@@ -418,4 +418,9 @@ document.addEventListener("DOMContentLoaded", () => {
             if (error) {
                 alert("Error: " + error.message);
             } else {
-                hero
+                heroModal.style.display = 'none';
+                loadHero(); 
+            }
+        });
+    }
+});
