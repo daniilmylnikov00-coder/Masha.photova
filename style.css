@@ -445,3 +445,38 @@ footer { text-align: center; padding: 40px; background-color: #1a1a1a; color: #f
     color: #ffffff !important;
     transform: scale(1.1);
 }
+
+/* --- СТРЕЛКИ ДЛЯ ЛАЙТБОКСА --- */
+.lightbox-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    border: none;
+    font-size: 3rem;
+    padding: 20px 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10000;
+    border-radius: 5px;
+    user-select: none;
+}
+
+.lightbox-nav:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.lightbox-prev { left: 20px; }
+.lightbox-next { right: 20px; }
+
+/* На мобильных телефонах делаем стрелки чуть меньше */
+@media (max-width: 768px) {
+    .lightbox-nav {
+        font-size: 2rem;
+        padding: 15px;
+    }
+    .lightbox-prev { left: 10px; }
+    .lightbox-next { right: 10px; }
+}
