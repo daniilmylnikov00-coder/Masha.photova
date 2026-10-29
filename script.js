@@ -38,11 +38,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const submitLogin = document.getElementById('submitLogin');
     const passwordInput = document.getElementById('passwordInput');
     const adminUploadZone = document.getElementById('admin-upload-zone');
-    const editPricingBtn = document.getElementById('editPricingBtn');
+    const addPricingBtn = document.getElementById('addPricingBtn');
 
     if (localStorage.getItem('isAdmin') === 'true') {
         if(adminUploadZone) adminUploadZone.style.display = 'block';
-        if(editPricingBtn) editPricingBtn.style.display = 'inline-block'; // Показываем кнопку в блоке цен
+        if(addPricingBtn) addPricingBtn.style.display = 'inline-block';
         if(loginBtn) loginBtn.style.display = 'none';
     }
 
@@ -54,9 +54,10 @@ document.addEventListener("DOMContentLoaded", () => {
             if (passwordInput.value === ADMIN_PASSWORD) {
                 localStorage.setItem('isAdmin', 'true');
                 if(adminUploadZone) adminUploadZone.style.display = 'block';
-                if(editPricingBtn) editPricingBtn.style.display = 'inline-block';
+                if(addPricingBtn) addPricingBtn.style.display = 'inline-block';
                 loginModal.style.display = 'none';
                 if(loginBtn) loginBtn.style.display = 'none';
+                loadPricing(); // Перезагружаем, чтобы появились карандаши
             } else {
                 alert("Wrong password!");
                 passwordInput.value = '';
@@ -89,7 +90,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!file) return uploadStatus.textContent = "Please select a file.";
 
             uploadStatus.textContent = "Uploading...";
-            uploadStatus.style.color = "black";
             doUploadBtn.disabled = true;
 
             try {
@@ -142,15 +142,33 @@ document.addEventListener("DOMContentLoaded", () => {
     const packageModal = document.getElementById('packageModal');
     const closePackage = document.getElementById('closePackage');
     const savePackageBtn = document.getElementById('savePackageBtn');
+    const packageModalTitle = document.getElementById('packageModalTitle');
+    
+    // Поля формы
+    const pkgId = document.getElementById('pkgId');
+    const pkgTitle = document.getElementById('pkgTitle');
+    const pkgPrice = document.getElementById('pkgPrice');
+    const pkgDesc = document.getElementById('pkgDesc');
+    const pkgFeatures = document.getElementById('pkgFeatures');
 
-    if (editPricingBtn) editPricingBtn.addEventListener('click', () => packageModal.style.display = 'block');
+    // Открытие пустой формы для ДОБАВЛЕНИЯ
+    if (addPricingBtn) {
+        addPricingBtn.addEventListener('click', () => {
+            packageModalTitle.textContent = "Add New Package";
+            pkgId.value = "";
+            pkgTitle.value = "";
+            pkgPrice.value = "";
+            pkgDesc.value = "";
+            pkgFeatures.value = "";
+            packageModal.style.display = 'block';
+        });
+    }
+
     if (closePackage) closePackage.addEventListener('click', () => packageModal.style.display = 'none');
 
-    // Загрузка цен из базы
     async function loadPricing() {
         if(!pricingContainer) return;
         
-        // Добавили подробный лог ошибки
         const { data: services, error } = await supabase.from('services').select('*').order('id', { ascending: true });
         
         if (error) {
@@ -160,21 +178,32 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (!services || services.length === 0) {
-            pricingContainer.innerHTML = '<p style="text-align:center; width:100%;">No packages found. Add one!</p>';
+            pricingContainer.innerHTML = '<p style="text-align:center; width:100%;">No packages found.</p>';
             return;
         }
 
+        const isAdmin = localStorage.getItem('isAdmin') === 'true';
         pricingContainer.innerHTML = '';
+
         services.forEach(svc => {
             const card = document.createElement('div');
             card.className = 'pricing-card';
+            card.style.position = 'relative'; // Для позиционирования карандаша
             
             let featuresHtml = '';
             if(svc.features && svc.features.length > 0) {
                 svc.features.forEach(f => featuresHtml += `<li>${f}</li>`);
             }
 
+            // Если админ, добавляем иконку карандаша
+            const editIcon = isAdmin ? `
+                <button class="edit-package-btn" data-id="${svc.id}" style="position: absolute; top: 15px; right: 15px; background: none; border: none; cursor: pointer; font-size: 1.2rem; color: #888;" title="Edit">
+                    ✏️
+                </button>
+            ` : '';
+
             card.innerHTML = `
+                ${editIcon}
                 <h4>${svc.title}</h4>
                 <div class="price">${svc.price}</div>
                 <p class="package-desc">${svc.description || ''}</p>
@@ -183,16 +212,37 @@ document.addEventListener("DOMContentLoaded", () => {
             `;
             pricingContainer.appendChild(card);
         });
+
+        // Навешиваем события на карандаши
+        if (isAdmin) {
+            document.querySelectorAll('.edit-package-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.target.getAttribute('data-id');
+                    // Находим данные в загруженном массиве
+                    const svc = services.find(s => s.id == id);
+                    if(svc) {
+                        packageModalTitle.textContent = "Edit Package";
+                        pkgId.value = svc.id;
+                        pkgTitle.value = svc.title;
+                        pkgPrice.value = svc.price;
+                        pkgDesc.value = svc.description || "";
+                        pkgFeatures.value = svc.features ? svc.features.join('\n') : "";
+                        packageModal.style.display = 'block';
+                    }
+                });
+            });
+        }
     }
     loadPricing();
 
-    // Сохранение нового пакета
+    // Сохранение (Создание или Обновление)
     if(savePackageBtn) {
         savePackageBtn.addEventListener('click', async () => {
-            const title = document.getElementById('pkgTitle').value;
-            const price = document.getElementById('pkgPrice').value;
-            const desc = document.getElementById('pkgDesc').value;
-            const featuresRaw = document.getElementById('pkgFeatures').value;
+            const id = pkgId.value;
+            const title = pkgTitle.value;
+            const price = pkgPrice.value;
+            const desc = pkgDesc.value;
+            const featuresRaw = pkgFeatures.value;
             
             const features = featuresRaw.split('\n').filter(f => f.trim() !== '');
 
@@ -201,9 +251,17 @@ document.addEventListener("DOMContentLoaded", () => {
             savePackageBtn.disabled = true;
             savePackageBtn.textContent = "Saving...";
 
-            const { error } = await supabase.from('services').insert([
-                { title: title, price: price, description: desc, features: features }
-            ]);
+            let error;
+            
+            if (id) {
+                // Если есть ID — обновляем существующий
+                const response = await supabase.from('services').update({ title, price, description: desc, features }).eq('id', id);
+                error = response.error;
+            } else {
+                // Если нет ID — создаем новый
+                const response = await supabase.from('services').insert([{ title, price, description: desc, features }]);
+                error = response.error;
+            }
 
             savePackageBtn.disabled = false;
             savePackageBtn.textContent = "Save Package";
@@ -212,12 +270,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert("Error: " + error.message);
             } else {
                 packageModal.style.display = 'none';
-                document.getElementById('pkgTitle').value = '';
-                document.getElementById('pkgPrice').value = '';
-                document.getElementById('pkgDesc').value = '';
-                document.getElementById('pkgFeatures').value = '';
-                loadPricing(); 
+                loadPricing(); // Перезагружаем карточки
             }
         });
     }
+});
 });
