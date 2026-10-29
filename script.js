@@ -39,12 +39,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const passwordInput = document.getElementById('passwordInput');
     const adminUploadZone = document.getElementById('admin-upload-zone');
     const addPricingBtn = document.getElementById('addPricingBtn');
+    const editAboutBtn = document.getElementById('editAboutBtn');
 
-    if (localStorage.getItem('isAdmin') === 'true') {
-        if(adminUploadZone) adminUploadZone.style.display = 'block';
-        if(addPricingBtn) addPricingBtn.style.display = 'inline-block';
-        if(loginBtn) loginBtn.style.display = 'none';
+    function checkAdmin() {
+        if (localStorage.getItem('isAdmin') === 'true') {
+            if(adminUploadZone) adminUploadZone.style.display = 'block';
+            if(addPricingBtn) addPricingBtn.style.display = 'inline-block';
+            if(editAboutBtn) editAboutBtn.style.display = 'flex';
+            if(loginBtn) loginBtn.style.display = 'none';
+        }
     }
+    checkAdmin();
 
     if (loginBtn) loginBtn.addEventListener('click', () => loginModal.style.display = 'block');
     if (closeLogin) closeLogin.addEventListener('click', () => loginModal.style.display = 'none');
@@ -53,12 +58,8 @@ document.addEventListener("DOMContentLoaded", () => {
         submitLogin.addEventListener('click', () => {
             if (passwordInput.value === ADMIN_PASSWORD) {
                 localStorage.setItem('isAdmin', 'true');
-                if(adminUploadZone) adminUploadZone.style.display = 'block';
-                if(addPricingBtn) addPricingBtn.style.display = 'inline-block';
                 loginModal.style.display = 'none';
-                if(loginBtn) loginBtn.style.display = 'none';
-                
-                // Перезагружаем галереи и цены, чтобы появились кнопки редактирования
+                checkAdmin(); // Обновляем видимость кнопок
                 loadGallery('portraits', 'gallery-portraits');
                 loadGallery('couples', 'gallery-couples');
                 loadGallery('brand', 'gallery-brand');
@@ -136,14 +137,12 @@ document.addEventListener("DOMContentLoaded", () => {
         filteredFiles.forEach(file => {
             const { data } = supabase.storage.from('photos').getPublicUrl(file.name);
             
-            // Создаем обертку для фото
             const wrapper = document.createElement('div');
             wrapper.className = 'photo-wrapper';
             
             const img = document.createElement('img');
             img.src = data.publicUrl;
             
-            // Клик для увеличения
             img.addEventListener('click', () => {
                 lightboxImg.src = data.publicUrl;
                 lightbox.classList.add('active');
@@ -151,51 +150,41 @@ document.addEventListener("DOMContentLoaded", () => {
             
             wrapper.appendChild(img);
 
-            // Если админ, добавляем кнопку удаления
             if (isAdmin) {
                 const deleteBtn = document.createElement('button');
                 deleteBtn.className = 'delete-photo-btn';
-                deleteBtn.innerHTML = '&times;'; // Крестик
+                deleteBtn.innerHTML = '&times;';
                 deleteBtn.title = "Delete photo";
                 
                 deleteBtn.addEventListener('click', async (e) => {
-                    e.stopPropagation(); // Чтобы не открывался лайтбокс
-                    
+                    e.stopPropagation();
                     if (confirm("Are you sure you want to delete this photo?")) {
                         deleteBtn.innerHTML = '...';
-                        
-                        // Удаляем файл из хранилища Supabase
                         const { error } = await supabase.storage.from('photos').remove([file.name]);
-                        
                         if (error) {
-                            alert("Error deleting: " + error.message);
+                            alert("Error: " + error.message);
                             deleteBtn.innerHTML = '&times;';
                         } else {
-                            // Удаляем фото с экрана
                             wrapper.remove(); 
                         }
                     }
                 });
-                
                 wrapper.appendChild(deleteBtn);
             }
-
             container.appendChild(wrapper);
         });
     }
     
-    // Первичная загрузка галерей
     loadGallery('portraits', 'gallery-portraits');
     loadGallery('couples', 'gallery-couples');
     loadGallery('brand', 'gallery-brand');
 
-    // === 5. РЕДАКТИРОВАНИЕ ЦЕН (БЛОК INVESTMENT) ===
+    // === 5. РЕДАКТИРОВАНИЕ ЦЕН ===
     const pricingContainer = document.getElementById('pricing-container');
     const packageModal = document.getElementById('packageModal');
     const closePackage = document.getElementById('closePackage');
     const savePackageBtn = document.getElementById('savePackageBtn');
     const packageModalTitle = document.getElementById('packageModalTitle');
-    
     const pkgId = document.getElementById('pkgId');
     const pkgTitle = document.getElementById('pkgTitle');
     const pkgPrice = document.getElementById('pkgPrice');
@@ -205,47 +194,30 @@ document.addEventListener("DOMContentLoaded", () => {
     if (addPricingBtn) {
         addPricingBtn.addEventListener('click', () => {
             packageModalTitle.textContent = "Add New Package";
-            pkgId.value = "";
-            pkgTitle.value = "";
-            pkgPrice.value = "";
-            pkgDesc.value = "";
-            pkgFeatures.value = "";
+            pkgId.value = ""; pkgTitle.value = ""; pkgPrice.value = ""; pkgDesc.value = ""; pkgFeatures.value = "";
             packageModal.style.display = 'block';
         });
     }
-
     if (closePackage) closePackage.addEventListener('click', () => packageModal.style.display = 'none');
 
     async function loadPricing() {
         if(!pricingContainer) return;
-        
         try {
             const { data: services, error } = await supabase.from('services').select('*').order('id', { ascending: true });
-            
             if (error) throw error;
-
             if (!services || services.length === 0) {
                 pricingContainer.innerHTML = '<p style="text-align:center; width:100%;">No packages found.</p>';
                 return;
             }
-
             const isAdmin = localStorage.getItem('isAdmin') === 'true';
             pricingContainer.innerHTML = '';
-
             services.forEach(svc => {
                 const card = document.createElement('div');
                 card.className = 'pricing-card';
                 card.style.position = 'relative';
-                
                 let featuresHtml = '';
-                if(svc.features && svc.features.length > 0) {
-                    svc.features.forEach(f => featuresHtml += `<li>${f}</li>`);
-                }
-
-                const editIcon = isAdmin ? `
-                    <button class="edit-package-btn" data-id="${svc.id}">✏️</button>
-                ` : '';
-
+                if(svc.features) svc.features.forEach(f => featuresHtml += `<li>${f}</li>`);
+                const editIcon = isAdmin ? `<button class="edit-package-btn" data-id="${svc.id}">✏️</button>` : '';
                 card.innerHTML = `
                     ${editIcon}
                     <h4>${svc.title}</h4>
@@ -256,7 +228,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 `;
                 pricingContainer.appendChild(card);
             });
-
             if (isAdmin) {
                 document.querySelectorAll('.edit-package-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
@@ -264,18 +235,13 @@ document.addEventListener("DOMContentLoaded", () => {
                         const svc = services.find(s => s.id == id);
                         if(svc) {
                             packageModalTitle.textContent = "Edit Package";
-                            pkgId.value = svc.id;
-                            pkgTitle.value = svc.title;
-                            pkgPrice.value = svc.price;
-                            pkgDesc.value = svc.description || "";
-                            pkgFeatures.value = svc.features ? svc.features.join('\n') : "";
+                            pkgId.value = svc.id; pkgTitle.value = svc.title; pkgPrice.value = svc.price; pkgDesc.value = svc.description || ""; pkgFeatures.value = svc.features ? svc.features.join('\n') : "";
                             packageModal.style.display = 'block';
                         }
                     });
                 });
             }
         } catch (error) {
-            console.error("Ошибка:", error);
             pricingContainer.innerHTML = `<p style="text-align:center; width:100%; color:red;">Failed to load: ${error.message}</p>`;
         }
     }
@@ -284,36 +250,84 @@ document.addEventListener("DOMContentLoaded", () => {
     if(savePackageBtn) {
         savePackageBtn.addEventListener('click', async () => {
             const id = pkgId.value;
-            const title = pkgTitle.value;
-            const price = pkgPrice.value;
-            const desc = pkgDesc.value;
-            const featuresRaw = pkgFeatures.value;
-            
-            const features = featuresRaw.split('\n').filter(f => f.trim() !== '');
-
-            if (!title || !price) return alert("Title and Price are required!");
-
+            const data = { title: pkgTitle.value, price: pkgPrice.value, description: pkgDesc.value, features: pkgFeatures.value.split('\n').filter(f => f.trim() !== '') };
+            if (!data.title || !data.price) return alert("Title and Price are required!");
             savePackageBtn.disabled = true;
             savePackageBtn.textContent = "Saving...";
-
             let error;
-            
             if (id) {
-                const response = await supabase.from('services').update({ title, price, description: desc, features }).eq('id', id);
+                const response = await supabase.from('services').update(data).eq('id', id);
                 error = response.error;
             } else {
-                const response = await supabase.from('services').insert([{ title, price, description: desc, features }]);
+                const response = await supabase.from('services').insert([data]);
                 error = response.error;
             }
-
             savePackageBtn.disabled = false;
             savePackageBtn.textContent = "Save Package";
+            if (error) alert("Error: " + error.message);
+            else { packageModal.style.display = 'none'; loadPricing(); }
+        });
+    }
+
+    // === 6. РЕДАКТИРОВАНИЕ БЛОКА ОБО МНЕ ===
+    const aboutTitle = document.getElementById('about-title');
+    const aboutP1 = document.getElementById('about-p1');
+    const aboutP2 = document.getElementById('about-p2');
+    const aboutModal = document.getElementById('aboutModal');
+    const closeAbout = document.getElementById('closeAbout');
+    const saveAboutBtn = document.getElementById('saveAboutBtn');
+    const aboutTitleInput = document.getElementById('aboutTitleInput');
+    const aboutP1Input = document.getElementById('aboutP1Input');
+    const aboutP2Input = document.getElementById('aboutP2Input');
+
+    // Загрузка текста из базы
+    async function loadAbout() {
+        const { data, error } = await supabase.from('about_settings').select('*').limit(1).single();
+        if (data) {
+            aboutTitle.innerHTML = data.title || "";
+            aboutP1.textContent = data.paragraph1 || "";
+            aboutP2.textContent = data.paragraph2 || "";
+            
+            // Заполняем скрытые поля для редактирования
+            if(aboutTitleInput) aboutTitleInput.value = (data.title || "").replace(/<br>/g, '\n');
+            if(aboutP1Input) aboutP1Input.value = data.paragraph1 || "";
+            if(aboutP2Input) aboutP2Input.value = data.paragraph2 || "";
+        }
+    }
+    loadAbout();
+
+    // Открытие окна редактирования
+    if (editAboutBtn) {
+        editAboutBtn.addEventListener('click', () => {
+            aboutModal.style.display = 'block';
+        });
+    }
+    if (closeAbout) closeAbout.addEventListener('click', () => aboutModal.style.display = 'none');
+
+    // Сохранение текста
+    if (saveAboutBtn) {
+        saveAboutBtn.addEventListener('click', async () => {
+            saveAboutBtn.disabled = true;
+            saveAboutBtn.textContent = "Saving...";
+            
+            const newTitle = aboutTitleInput.value.replace(/\n/g, '<br>');
+            const newP1 = aboutP1Input.value;
+            const newP2 = aboutP2Input.value;
+
+            const { error } = await supabase.from('about_settings').update({
+                title: newTitle,
+                paragraph1: newP1,
+                paragraph2: newP2
+            }).eq('id', 1); // Обновляем первую (и единственную) запись
+
+            saveAboutBtn.disabled = false;
+            saveAboutBtn.textContent = "Save Changes";
 
             if (error) {
                 alert("Error: " + error.message);
             } else {
-                packageModal.style.display = 'none';
-                loadPricing(); 
+                aboutModal.style.display = 'none';
+                loadAbout(); // Перезагружаем текст на странице
             }
         });
     }
