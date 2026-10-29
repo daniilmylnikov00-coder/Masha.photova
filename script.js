@@ -123,49 +123,55 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!container) return;
         const isAdmin = localStorage.getItem('isAdmin') === 'true';
         
-        const { data: files } = await supabase.storage.from('photos').list('', { limit: 100, sortBy: { column: 'created_at', order: 'desc' } });
-        const filteredFiles = files.filter(f => f.name.startsWith(category + '_'));
-        
-        if (filteredFiles.length === 0) {
-            container.innerHTML = '<p style="padding: 20px; color: #888;">No photos yet.</p>';
-            return;
-        }
-        container.innerHTML = ''; 
-        
-        filteredFiles.forEach(file => {
-            const { data } = supabase.storage.from('photos').getPublicUrl(file.name);
-            const wrapper = document.createElement('div');
-            wrapper.className = 'photo-wrapper';
-            const img = document.createElement('img');
-            img.src = data.publicUrl;
-            img.addEventListener('click', () => {
-                lightboxImg.src = data.publicUrl;
-                lightbox.classList.add('active');
-            });
-            wrapper.appendChild(img);
+        try {
+            const { data: files, error } = await supabase.storage.from('photos').list('', { limit: 100, sortBy: { column: 'created_at', order: 'desc' } });
+            if (error) throw error;
 
-            if (isAdmin) {
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'delete-photo-btn';
-                deleteBtn.innerHTML = '&times;';
-                deleteBtn.title = "Delete photo";
-                deleteBtn.addEventListener('click', async (e) => {
-                    e.stopPropagation();
-                    if (confirm("Are you sure you want to delete this photo?")) {
-                        deleteBtn.innerHTML = '...';
-                        const { error } = await supabase.storage.from('photos').remove([file.name]);
-                        if (error) {
-                            alert("Error: " + error.message);
-                            deleteBtn.innerHTML = '&times;';
-                        } else {
-                            wrapper.remove(); 
-                        }
-                    }
-                });
-                wrapper.appendChild(deleteBtn);
+            const filteredFiles = files.filter(f => f.name.startsWith(category + '_'));
+            
+            if (filteredFiles.length === 0) {
+                container.innerHTML = '<p style="padding: 20px; color: #888;">No photos yet.</p>';
+                return;
             }
-            container.appendChild(wrapper);
-        });
+            container.innerHTML = ''; 
+            
+            filteredFiles.forEach(file => {
+                const { data } = supabase.storage.from('photos').getPublicUrl(file.name);
+                const wrapper = document.createElement('div');
+                wrapper.className = 'photo-wrapper';
+                const img = document.createElement('img');
+                img.src = data.publicUrl;
+                img.addEventListener('click', () => {
+                    lightboxImg.src = data.publicUrl;
+                    lightbox.classList.add('active');
+                });
+                wrapper.appendChild(img);
+
+                if (isAdmin) {
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-photo-btn';
+                    deleteBtn.innerHTML = '&times;';
+                    deleteBtn.title = "Delete photo";
+                    deleteBtn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        if (confirm("Are you sure you want to delete this photo?")) {
+                            deleteBtn.innerHTML = '...';
+                            const { error } = await supabase.storage.from('photos').remove([file.name]);
+                            if (error) {
+                                alert("Error: " + error.message);
+                                deleteBtn.innerHTML = '&times;';
+                            } else {
+                                wrapper.remove(); 
+                            }
+                        }
+                    });
+                    wrapper.appendChild(deleteBtn);
+                }
+                container.appendChild(wrapper);
+            });
+        } catch (error) {
+            container.innerHTML = '<p style="padding: 20px; color: red;">Failed to load photos.</p>';
+        }
     }
     loadGallery('portraits', 'gallery-portraits');
     loadGallery('couples', 'gallery-couples');
@@ -197,12 +203,14 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             const { data: services, error } = await supabase.from('services').select('*').order('id', { ascending: true });
             if (error) throw error;
+            
             if (!services || services.length === 0) {
                 pricingContainer.innerHTML = '<p style="text-align:center; width:100%;">No packages found.</p>';
                 return;
             }
             const isAdmin = localStorage.getItem('isAdmin') === 'true';
             pricingContainer.innerHTML = '';
+            
             services.forEach(svc => {
                 const card = document.createElement('div');
                 card.className = 'pricing-card';
@@ -220,6 +228,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 `;
                 pricingContainer.appendChild(card);
             });
+            
             if (isAdmin) {
                 document.querySelectorAll('.edit-package-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
@@ -272,26 +281,34 @@ document.addEventListener("DOMContentLoaded", () => {
     const aboutTitleInput = document.getElementById('aboutTitleInput');
     const aboutP1Input = document.getElementById('aboutP1Input');
     const aboutP2Input = document.getElementById('aboutP2Input');
-
     const aboutImgInput = document.getElementById('aboutImgInput');
     const uploadAboutImgBtn = document.getElementById('uploadAboutImgBtn');
     const aboutUploadStatus = document.getElementById('aboutUploadStatus');
 
-    // Загрузка текста и фото из базы
     async function loadAbout() {
-        const { data, error } = await supabase.from('about_settings').select('*').limit(1).single();
-        if (data) {
-            aboutTitle.innerHTML = data.title || "";
-            aboutP1.textContent = data.paragraph1 || "";
-            aboutP2.textContent = data.paragraph2 || "";
+        try {
+            const { data, error } = await supabase.from('about_settings').select('*').limit(1).single();
+            // Игнорируем ошибку, если таблица пуста
+            if (error && error.code !== 'PGRST116') throw error; 
             
-            if (data.image_url) {
-                aboutImg.src = data.image_url; // Если есть загруженное фото, ставим его
-            }
+            if (data) {
+                aboutTitle.innerHTML = data.title || "Nice to meet you.<br>I photograph what matters most.";
+                aboutP1.textContent = data.paragraph1 || "";
+                aboutP2.textContent = data.paragraph2 || "";
+                if (data.image_url) aboutImg.src = data.image_url;
 
-            if(aboutTitleInput) aboutTitleInput.value = (data.title || "").replace(/<br>/g, '\n');
-            if(aboutP1Input) aboutP1Input.value = data.paragraph1 || "";
-            if(aboutP2Input) aboutP2Input.value = data.paragraph2 || "";
+                if(aboutTitleInput) aboutTitleInput.value = (data.title || "").replace(/<br>/g, '\n');
+                if(aboutP1Input) aboutP1Input.value = data.paragraph1 || "";
+                if(aboutP2Input) aboutP2Input.value = data.paragraph2 || "";
+            } else {
+                throw new Error("No data");
+            }
+        } catch (error) {
+            console.error("Ошибка загрузки About:", error);
+            // Если база не отвечает или пуста, показываем текст по умолчанию
+            aboutTitle.innerHTML = "Nice to meet you.<br>I photograph what matters most.";
+            aboutP1.textContent = "Hi, I'm Mariia — a photographer serving the NoVa & DC area. I specialize in portrait, couples, and lifestyle photography.";
+            aboutP2.textContent = "My sessions are calm, unhurried, and real. I don't pose people — I create space for them to just be themselves. That's where the best photos happen.";
         }
     }
     loadAbout();
@@ -303,7 +320,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     if (closeAbout) closeAbout.addEventListener('click', () => aboutModal.style.display = 'none');
 
-    // Загрузка нового фото для блока "Обо мне"
     if (uploadAboutImgBtn) {
         uploadAboutImgBtn.addEventListener('click', async () => {
             const file = aboutImgInput.files[0];
@@ -314,26 +330,18 @@ document.addEventListener("DOMContentLoaded", () => {
             uploadAboutImgBtn.disabled = true;
 
             try {
-                // Генерируем уникальное имя файла
                 const fileName = `about_${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
-                
-                // Загружаем в тот же бакет 'photos', но с префиксом 'about_'
                 const { error: uploadError } = await supabase.storage.from('photos').upload(fileName, file);
                 if (uploadError) throw uploadError;
 
-                // Получаем публичную ссылку
                 const { data: urlData } = supabase.storage.from('photos').getPublicUrl(fileName);
-                
-                // Сохраняем ссылку в таблицу about_settings
                 const { error: dbError } = await supabase.from('about_settings').update({ image_url: urlData.publicUrl }).eq('id', 1);
                 if (dbError) throw dbError;
 
                 aboutUploadStatus.textContent = "Photo updated successfully!";
                 aboutUploadStatus.style.color = "green";
-                aboutImg.src = urlData.publicUrl; // Обновляем фото на странице сразу
-
+                aboutImg.src = urlData.publicUrl; 
             } catch (error) {
-                console.error(error);
                 aboutUploadStatus.textContent = "Error: " + error.message;
                 aboutUploadStatus.style.color = "red";
             } finally {
@@ -342,7 +350,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Сохранение текста
     if (saveAboutBtn) {
         saveAboutBtn.addEventListener('click', async () => {
             saveAboutBtn.disabled = true;
@@ -365,9 +372,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert("Error: " + error.message);
             } else {
                 aboutModal.style.display = 'none';
-                loadAbout(); // Перезагружаем текст на странице
+                loadAbout();
             }
         });
     }
-});
-});
+}); // <--- ЗДЕСЬ ДОЛЖНА БЫТЬ ТОЛЬКО ОДНА ЗАКРЫВАЮЩАЯ СКОБКА
