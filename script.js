@@ -40,12 +40,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const adminUploadZone = document.getElementById('admin-upload-zone');
     const addPricingBtn = document.getElementById('addPricingBtn');
     const editAboutBtn = document.getElementById('editAboutBtn');
+    const editHeroBtn = document.getElementById('editHeroBtn');
 
     function checkAdmin() {
         if (localStorage.getItem('isAdmin') === 'true') {
             if(adminUploadZone) adminUploadZone.style.display = 'block';
             if(addPricingBtn) addPricingBtn.style.display = 'inline-block';
             if(editAboutBtn) editAboutBtn.style.display = 'flex';
+            if(editHeroBtn) editHeroBtn.style.display = 'flex'; // Показываем карандаш на главном экране
             if(loginBtn) loginBtn.style.display = 'none';
         }
     }
@@ -288,7 +290,6 @@ document.addEventListener("DOMContentLoaded", () => {
     async function loadAbout() {
         try {
             const { data, error } = await supabase.from('about_settings').select('*').limit(1).single();
-            // Игнорируем ошибку, если таблица пуста
             if (error && error.code !== 'PGRST116') throw error; 
             
             if (data) {
@@ -296,19 +297,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 aboutP1.textContent = data.paragraph1 || "";
                 aboutP2.textContent = data.paragraph2 || "";
                 if (data.image_url) aboutImg.src = data.image_url;
-
                 if(aboutTitleInput) aboutTitleInput.value = (data.title || "").replace(/<br>/g, '\n');
                 if(aboutP1Input) aboutP1Input.value = data.paragraph1 || "";
                 if(aboutP2Input) aboutP2Input.value = data.paragraph2 || "";
-            } else {
-                throw new Error("No data");
             }
         } catch (error) {
-            console.error("Ошибка загрузки About:", error);
-            // Если база не отвечает или пуста, показываем текст по умолчанию
             aboutTitle.innerHTML = "Nice to meet you.<br>I photograph what matters most.";
-            aboutP1.textContent = "Hi, I'm Mariia — a photographer serving the NoVa & DC area. I specialize in portrait, couples, and lifestyle photography.";
-            aboutP2.textContent = "My sessions are calm, unhurried, and real. I don't pose people — I create space for them to just be themselves. That's where the best photos happen.";
+            aboutP1.textContent = "Hi, I'm Mariia — a photographer serving the NoVa & DC area.";
+            aboutP2.textContent = "My sessions are calm, unhurried, and real.";
         }
     }
     loadAbout();
@@ -354,26 +350,72 @@ document.addEventListener("DOMContentLoaded", () => {
         saveAboutBtn.addEventListener('click', async () => {
             saveAboutBtn.disabled = true;
             saveAboutBtn.textContent = "Saving text...";
-            
             const newTitle = aboutTitleInput.value.replace(/\n/g, '<br>');
-            const newP1 = aboutP1Input.value;
-            const newP2 = aboutP2Input.value;
-
-            const { error } = await supabase.from('about_settings').update({
-                title: newTitle,
-                paragraph1: newP1,
-                paragraph2: newP2
-            }).eq('id', 1);
-
+            const { error } = await supabase.from('about_settings').update({ title: newTitle, paragraph1: aboutP1Input.value, paragraph2: aboutP2Input.value }).eq('id', 1);
             saveAboutBtn.disabled = false;
             saveAboutBtn.textContent = "Save Changes";
+            if (error) alert("Error: " + error.message);
+            else { aboutModal.style.display = 'none'; loadAbout(); }
+        });
+    }
+
+    // === 7. РЕДАКТИРОВАНИЕ ГЛАВНОГО ЭКРАНА (HERO) ===
+    const heroTitle = document.getElementById('hero-title');
+    const heroSubtitle = document.getElementById('hero-subtitle');
+    const heroBtn1 = document.getElementById('hero-btn1');
+    const heroBtn2 = document.getElementById('hero-btn2');
+    const heroModal = document.getElementById('heroModal');
+    const closeHero = document.getElementById('closeHero');
+    const saveHeroBtn = document.getElementById('saveHeroBtn');
+    
+    const heroTitleInput = document.getElementById('heroTitleInput');
+    const heroSubtitleInput = document.getElementById('heroSubtitleInput');
+    const heroBtn1Input = document.getElementById('heroBtn1Input');
+    const heroBtn2Input = document.getElementById('heroBtn2Input');
+
+    async function loadHero() {
+        try {
+            const { data, error } = await supabase.from('hero_settings').select('*').limit(1).single();
+            if (error && error.code !== 'PGRST116') throw error; 
+            
+            if (data) {
+                heroTitle.innerHTML = data.title || "Moments worth keeping.";
+                heroSubtitle.textContent = data.subtitle || "Real moments. Warm light. Images you'll keep forever.";
+                heroBtn1.textContent = data.btn1_text || "Check Availability";
+                heroBtn2.textContent = data.btn2_text || "View Portfolio";
+
+                heroTitleInput.value = (data.title || "").replace(/<br>/g, '\n');
+                heroSubtitleInput.value = data.subtitle || "";
+                heroBtn1Input.value = data.btn1_text || "";
+                heroBtn2Input.value = data.btn2_text || "";
+            }
+        } catch (error) {
+            console.log("Hero text using defaults.");
+        }
+    }
+    loadHero();
+
+    if (editHeroBtn) editHeroBtn.addEventListener('click', () => heroModal.style.display = 'block');
+    if (closeHero) closeHero.addEventListener('click', () => heroModal.style.display = 'none');
+
+    if (saveHeroBtn) {
+        saveHeroBtn.addEventListener('click', async () => {
+            saveHeroBtn.disabled = true;
+            saveHeroBtn.textContent = "Saving...";
+            
+            const newTitle = heroTitleInput.value.replace(/\n/g, '<br>');
+            
+            const { error } = await supabase.from('hero_settings').update({
+                title: newTitle,
+                subtitle: heroSubtitleInput.value,
+                btn1_text: heroBtn1Input.value,
+                btn2_text: heroBtn2Input.value
+            }).eq('id', 1);
+
+            saveHeroBtn.disabled = false;
+            saveHeroBtn.textContent = "Save Changes";
 
             if (error) {
                 alert("Error: " + error.message);
             } else {
-                aboutModal.style.display = 'none';
-                loadAbout();
-            }
-        });
-    }
-}); // <--- ЗДЕСЬ ДОЛЖНА БЫТЬ ТОЛЬКО ОДНА ЗАКРЫВАЮЩАЯ СКОБКА
+                hero
