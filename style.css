@@ -353,3 +353,56 @@ footer { text-align: center; padding: 40px; background-color: #1a1a1a; color: #f
     background: #1a1a1a;
     transform: scale(1.1);
 }
+
+/* Обертка для фото, чтобы позиционировать крестик */
+.photo-wrapper {
+    position: relative;
+    display: inline-block;
+    scroll-snap-align: start;
+}
+
+/* Кнопка удаления (крестик) */
+.delete-photo-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    font-size: 1.2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    opacity: 0; /* Скрыт по умолчанию */
+    transition: opacity 0.3s ease, background 0.3s ease;
+    z-index: 10;
+}
+
+/* Показываем крестик при наведении на фото */
+.photo-wrapper:hover .delete-photo-btn {
+    opacity: 1;
+}
+
+.delete-photo-btn:hover {
+    background: #ff4d4d; /* Красный при наведении */
+}
+
+/* В мобильной версии крестик всегда виден (там нет наведения мыши) */
+@media (max-width: 768px) {
+    .delete-photo-btn {
+        opacity: 1; 
+    }
+}
+
+/* Чтобы фото внутри обертки не теряло стили */
+.photo-wrapper img {
+    height: 300px;
+    width: auto;
+    object-fit: cover;
+    border-radius: 4px;
+    transition: transform 0.3s ease;
+}
