@@ -15,7 +15,6 @@
             <h1>MARIIA SMIRNOVA</h1>
             <span>Photography</span>
         </div>
-        <!-- Оставили только кнопку Login -->
         <button id="loginBtn" class="login-link">Login</button>
     </nav>
 
@@ -88,14 +87,13 @@
     <!-- Инвестиции (Цены) -->
     <section id="pricing" class="section fade-in bg-light">
         <div class="container">
-            <!-- Кнопка добавления теперь прямо в блоке цен -->
             <div style="text-align: center; margin-bottom: 20px;">
                 <h3 class="section-title" style="margin-bottom: 10px;">Investment</h3>
-                <button id="editPricingBtn" class="btn-secondary" style="display:none; border-color: #1a1a1a; color: #1a1a1a; padding: 10px 20px; font-size: 0.8rem;">+ Add New Package</button>
+                <!-- Кнопка добавления -->
+                <button id="addPricingBtn" class="btn-secondary" style="display:none; border-color: #1a1a1a; color: #1a1a1a; padding: 10px 20px; font-size: 0.8rem;">+ Add New Package</button>
             </div>
             <p class="section-subtitle" style="margin-top: -10px;">Transparent pricing for a seamless experience.</p>
             
-            <!-- Сюда скрипт вставит карточки из базы -->
             <div class="pricing-grid" id="pricing-container">
                 <p style="text-align:center; width:100%;">Loading packages...</p>
             </div>
@@ -151,11 +149,15 @@
         </div>
     </div>
 
-    <!-- Модальное окно ДОБАВЛЕНИЯ ПАКЕТА -->
+    <!-- Модальное окно ДОБАВЛЕНИЯ / РЕДАКТИРОВАНИЯ ПАКЕТА -->
     <div id="packageModal" class="modal">
         <div class="modal-content" style="max-width: 500px;">
             <span class="close" id="closePackage">&times;</span>
-            <h3>Add New Package</h3>
+            <h3 id="packageModalTitle">Add New Package</h3>
+            
+            <!-- Скрытое поле для ID (чтобы понимать, редактируем мы или создаем) -->
+            <input type="hidden" id="pkgId">
+            
             <input type="text" id="pkgTitle" placeholder="Title (e.g. Premium)" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd;">
             <input type="text" id="pkgPrice" placeholder="Price (e.g. $800)" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd;">
             <input type="text" id="pkgDesc" placeholder="Short description (e.g. 3-hour session)" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd;">
