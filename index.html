@@ -73,15 +73,13 @@
     <!-- Блок Обо мне -->
     <section id="about" class="section fade-in">
         <div class="container about-container" style="position: relative;">
-            
-            <!-- Кнопка редактирования (карандаш) -->
             <button id="editAboutBtn" class="edit-package-btn" style="display: none; top: 0; right: 0;">✏️</button>
-
+            
             <div class="about-image">
-                <img src="Image/IMG_1490.jpeg" alt="Mariia Smirnova">
+                <!-- Сюда скрипт вставит ссылку из базы -->
+                <img id="about-img" src="Image/IMG_1490.jpeg" alt="Mariia Smirnova">
             </div>
             <div class="about-text">
-                <!-- Сюда скрипт вставит текст из базы -->
                 <h3 id="about-title"></h3>
                 <p id="about-p1"></p>
                 <p id="about-p2"></p>
@@ -97,10 +95,7 @@
                 <button id="addPricingBtn" class="btn-secondary" style="display:none; border-color: #1a1a1a; color: #1a1a1a; padding: 10px 20px; font-size: 0.8rem;">+ Add New Package</button>
             </div>
             <p class="section-subtitle" style="margin-top: -10px;">Transparent pricing for a seamless experience.</p>
-            
-            <div class="pricing-grid" id="pricing-container">
-                <p style="text-align:center; width:100%;">Loading packages...</p>
-            </div>
+            <div class="pricing-grid" id="pricing-container"><p style="text-align:center; width:100%;">Loading packages...</p></div>
         </div>
     </section>
 
@@ -136,7 +131,7 @@
         </div>
     </div>
 
-    <!-- Модальное окно ЗАГРУЗКИ ФОТО -->
+    <!-- Модальное окно ЗАГРУЗКИ ФОТО (Галерея) -->
     <div id="uploadModal" class="modal">
         <div class="modal-content" style="max-width: 400px; text-align: center;">
             <span class="close" id="closeUpload">&times;</span>
@@ -159,9 +154,9 @@
             <span class="close" id="closePackage">&times;</span>
             <h3 id="packageModalTitle">Add New Package</h3>
             <input type="hidden" id="pkgId">
-            <input type="text" id="pkgTitle" placeholder="Title (e.g. Premium)" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd;">
-            <input type="text" id="pkgPrice" placeholder="Price (e.g. $800)" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd;">
-            <input type="text" id="pkgDesc" placeholder="Short description (e.g. 3-hour session)" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd;">
+            <input type="text" id="pkgTitle" placeholder="Title" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd;">
+            <input type="text" id="pkgPrice" placeholder="Price" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd;">
+            <input type="text" id="pkgDesc" placeholder="Short description" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd;">
             <textarea id="pkgFeatures" placeholder="Features (one per line)" style="width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd; height: 100px;"></textarea>
             <button id="savePackageBtn" class="btn-primary" style="width: 100%;">Save Package</button>
         </div>
@@ -172,9 +167,19 @@
         <div class="modal-content" style="max-width: 600px;">
             <span class="close" id="closeAbout">&times;</span>
             <h3>Edit About Section</h3>
+            
+            <!-- Загрузка фото для блока "Обо мне" -->
+            <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #ddd; text-align: center;">
+                <p style="margin-bottom: 10px; font-weight: bold;">Update Photo</p>
+                <input type="file" id="aboutImgInput" accept="image/*" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd;">
+                <button type="button" id="uploadAboutImgBtn" class="btn-secondary" style="padding: 10px 20px; font-size: 0.8rem;">Upload Photo</button>
+                <p id="aboutUploadStatus" style="margin-top: 10px; font-size: 0.9rem; font-weight: bold;"></p>
+            </div>
+
             <textarea id="aboutTitleInput" rows="2" placeholder="Title" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; font-family: 'Cormorant Garamond', serif; font-size: 1.2rem;"></textarea>
             <textarea id="aboutP1Input" rows="4" placeholder="First paragraph" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd;"></textarea>
             <textarea id="aboutP2Input" rows="4" placeholder="Second paragraph" style="width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd;"></textarea>
+            
             <button id="saveAboutBtn" class="btn-primary" style="width: 100%;">Save Changes</button>
         </div>
     </div>
