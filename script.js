@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (localStorage.getItem('isAdmin') === 'true') {
         if(adminUploadZone) adminUploadZone.style.display = 'block';
-        if(editPricingBtn) editPricingBtn.style.display = 'block';
+        if(editPricingBtn) editPricingBtn.style.display = 'inline-block'; // Показываем кнопку в блоке цен
         if(loginBtn) loginBtn.style.display = 'none';
     }
 
@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (passwordInput.value === ADMIN_PASSWORD) {
                 localStorage.setItem('isAdmin', 'true');
                 if(adminUploadZone) adminUploadZone.style.display = 'block';
-                if(editPricingBtn) editPricingBtn.style.display = 'block';
+                if(editPricingBtn) editPricingBtn.style.display = 'inline-block';
                 loginModal.style.display = 'none';
                 if(loginBtn) loginBtn.style.display = 'none';
             } else {
@@ -149,17 +149,26 @@ document.addEventListener("DOMContentLoaded", () => {
     // Загрузка цен из базы
     async function loadPricing() {
         if(!pricingContainer) return;
+        
+        // Добавили подробный лог ошибки
         const { data: services, error } = await supabase.from('services').select('*').order('id', { ascending: true });
-        if (error || services.length === 0) {
-            pricingContainer.innerHTML = '<p>Error loading packages.</p>';
+        
+        if (error) {
+            console.error("Ошибка загрузки цен:", error);
+            pricingContainer.innerHTML = `<p style="text-align:center; width:100%; color:red;">Error: ${error.message}</p>`;
             return;
         }
+
+        if (!services || services.length === 0) {
+            pricingContainer.innerHTML = '<p style="text-align:center; width:100%;">No packages found. Add one!</p>';
+            return;
+        }
+
         pricingContainer.innerHTML = '';
         services.forEach(svc => {
             const card = document.createElement('div');
             card.className = 'pricing-card';
             
-            // Собираем список фич
             let featuresHtml = '';
             if(svc.features && svc.features.length > 0) {
                 svc.features.forEach(f => featuresHtml += `<li>${f}</li>`);
@@ -185,7 +194,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const desc = document.getElementById('pkgDesc').value;
             const featuresRaw = document.getElementById('pkgFeatures').value;
             
-            // Разбиваем текст на массив строк
             const features = featuresRaw.split('\n').filter(f => f.trim() !== '');
 
             if (!title || !price) return alert("Title and Price are required!");
@@ -208,7 +216,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.getElementById('pkgPrice').value = '';
                 document.getElementById('pkgDesc').value = '';
                 document.getElementById('pkgFeatures').value = '';
-                loadPricing(); // Перезагружаем карточки
+                loadPricing(); 
             }
         });
     }
